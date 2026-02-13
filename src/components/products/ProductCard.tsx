@@ -1,0 +1,119 @@
+// src/components/products/ProductCard.tsx
+
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Heart, ShoppingCart, Eye } from "lucide-react";
+import { Product } from "@/types/product";
+import { useCartStore } from "@/store/cartStore";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { formatPrice } from "@/lib/utils/formatters";
+
+interface ProductCardProps {
+  product: Product;
+  onQuickView?: (product: Product) => void;
+}
+
+export const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
+  const { addItem, isInCart } = useCartStore();
+  const inCart = isInCart(product.id);
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem(product);
+  };
+
+  const handleQuickView = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onQuickView?.(product);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.3 }}
+      className="group relative"
+    >
+      <Link href={`/productos/${product.id}`}>
+        <div className="relative overflow-hidden rounded-lg bg-gray-100 aspect-square">
+          {/* Badges */}
+          <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
+            {product.coleccion && (
+              <Badge className="bg-purple-500 hover:bg-purple-600">
+                {product.coleccion}
+              </Badge>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="absolute top-3 right-3 z-10 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button
+              size="icon"
+              variant="secondary"
+              className="rounded-full shadow-lg"
+              onClick={handleQuickView}
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="secondary"
+              className="rounded-full shadow-lg"
+            >
+              <Heart className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Image */}
+          <Image
+            src={product.imagen || "/images/placeholder.jpg"}
+            alt={product.imagenAlt || product.nombre}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-110"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+
+          {/* Hover overlay */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+        </div>
+
+        {/* Product info */}
+        <div className="mt-4 space-y-2">
+          {/* Tipo (Categoría) */}
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">
+            {product.tipo}
+          </p>
+
+          {/* Nombre */}
+          <h3 className="font-medium text-sm line-clamp-2 group-hover:text-primary transition-colors">
+            {product.nombre}
+          </h3>
+
+          {/* Precio */}
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-lg">
+              {formatPrice(product.precio)}
+            </span>
+          </div>
+        </div>
+      </Link>
+
+      {/* Add to cart button */}
+      <Button
+        className="w-full mt-3"
+        onClick={handleAddToCart}
+        variant={inCart ? "secondary" : "default"}
+      >
+        <ShoppingCart className="mr-2 h-4 w-4" />
+        {inCart ? "En el carrito" : "Agregar al carrito"}
+      </Button>
+    </motion.div>
+  );
+};
