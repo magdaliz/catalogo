@@ -10,6 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/utils/formatters";
 import { toast } from "sonner";
+import { useFavorites } from "@/lib/favorites/FavoritesContext";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface ProductListViewProps {
   products: Product[];
@@ -21,6 +24,9 @@ export const ProductListView = ({
   onQuickView,
 }: ProductListViewProps) => {
   const { addItem, isInCart } = useCartStore();
+  const { user } = useAuth();
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const router = useRouter();
 
   const handleAddToCart = (e: React.MouseEvent, product: Product) => {
     e.preventDefault();
@@ -37,10 +43,34 @@ export const ProductListView = ({
     onQuickView?.(product);
   };
 
+  const handleFavorite = async (e: React.MouseEvent, product: Product) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      router.push("/login?redirect=/favoritos");
+      return;
+    }
+
+    try {
+      const favorite = isFavorite(product.id);
+      await toggleFavorite(product);
+      toast.success(
+        favorite ? "Quitado de favoritos" : "Agregado a favoritos",
+      );
+    } catch (error: any) {
+      console.error("toggleFavorite error:", error);
+      toast.error("No se pudo actualizar favoritos", {
+        description: error?.code || error?.message || "Error desconocido",
+      });
+    }
+  };
+
   return (
     <div className="space-y-4">
       {products.map((product) => {
         const inCart = isInCart(product.id);
+        const favorite = isFavorite(product.id);
 
         return (
           <Link
@@ -114,8 +144,14 @@ export const ProductListView = ({
                     <Eye className="h-4 w-4" />
                   </Button>
 
-                  <Button variant="outline" size="sm">
-                    <Heart className="h-4 w-4" />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => handleFavorite(e, product)}
+                  >
+                    <Heart
+                      className={`h-4 w-4 ${favorite ? "fill-current text-red-500" : ""}`}
+                    />
                   </Button>
                 </div>
               </div>
@@ -130,8 +166,14 @@ export const ProductListView = ({
                   <Eye className="h-4 w-4" />
                 </Button>
 
-                <Button variant="outline" size="icon">
-                  <Heart className="h-4 w-4" />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={(e) => handleFavorite(e, product)}
+                >
+                  <Heart
+                    className={`h-4 w-4 ${favorite ? "fill-current text-red-500" : ""}`}
+                  />
                 </Button>
 
                 <Button

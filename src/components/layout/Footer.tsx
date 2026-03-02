@@ -1,7 +1,8 @@
 // src/components/layout/Footer.tsx
 
 import Link from "next/link";
-import { Facebook, Instagram, Twitter, Mail } from "lucide-react";
+import { Facebook, Instagram, Twitter } from "lucide-react";
+import { NewsletterForm } from "@/components/shared/NewsletterForm";
 
 export const Footer = () => {
   return (
@@ -125,16 +126,7 @@ export const Footer = () => {
             <p className="text-sm text-muted-foreground mb-4">
               Suscríbete para recibir ofertas exclusivas
             </p>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Tu email"
-                className="flex-1 px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <button className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
-                <Mail className="h-4 w-4" />
-              </button>
-            </div>
+            <NewsletterForm />
           </div>
         </div>
 

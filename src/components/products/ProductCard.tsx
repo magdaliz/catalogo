@@ -11,6 +11,10 @@ import { useCartStore } from "@/store/cartStore";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/utils/formatters";
+import { useFavorites } from "@/lib/favorites/FavoritesContext";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface ProductCardProps {
   product: Product;
@@ -19,7 +23,11 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
   const { addItem, isInCart } = useCartStore();
+  const { user } = useAuth();
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const router = useRouter();
   const inCart = isInCart(product.id);
+  const favorite = isFavorite(product.id);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -31,6 +39,28 @@ export const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
     e.preventDefault();
     e.stopPropagation();
     onQuickView?.(product);
+  };
+
+  const handleFavorite = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      router.push("/login?redirect=/favoritos");
+      return;
+    }
+
+    try {
+      await toggleFavorite(product);
+      toast.success(
+        favorite ? "Quitado de favoritos" : "Agregado a favoritos",
+      );
+    } catch (error: any) {
+      console.error("toggleFavorite error:", error);
+      toast.error("No se pudo actualizar favoritos", {
+        description: error?.code || error?.message || "Error desconocido",
+      });
+    }
   };
 
   return (
@@ -67,8 +97,11 @@ export const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
               size="icon"
               variant="secondary"
               className="rounded-full shadow-lg"
+              onClick={handleFavorite}
             >
-              <Heart className="h-4 w-4" />
+              <Heart
+                className={`h-4 w-4 ${favorite ? "fill-current text-red-500" : ""}`}
+              />
             </Button>
           </div>
 

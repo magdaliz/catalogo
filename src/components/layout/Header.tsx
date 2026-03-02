@@ -1,16 +1,57 @@
 // src/components/layout/Header.tsx
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ShoppingCart, Search, Heart, Menu, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/cartStore";
 import { SearchBar } from "@/components/shared/SearchBar";
 import { CartDrawer } from "@/components/cart/CartDrawer";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { toast } from "sonner";
 
 export const Header = () => {
   const { items, toggleCart, getItemCount } = useCartStore();
+  const { user, logout } = useAuth();
   const itemCount = getItemCount();
+  const favoritesHref = user ? "/favoritos" : "/login?redirect=/favoritos";
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [avatarFailed, setAvatarFailed] = useState(false);
+  const profileRef = useRef<HTMLDivElement | null>(null);
+
+  const userInitial = (user?.displayName?.trim()?.charAt(0) ||
+    user?.email?.trim()?.charAt(0) ||
+    "U"
+  ).toUpperCase();
+
+  useEffect(() => {
+    setAvatarFailed(false);
+  }, [user?.uid, user?.photoURL]);
+
+  useEffect(() => {
+    const onClickOutside = (event: MouseEvent) => {
+      if (!profileRef.current) return;
+      if (!profileRef.current.contains(event.target as Node)) {
+        setProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setProfileMenuOpen(false);
+      toast.success("Sesion cerrada");
+    } catch (error: any) {
+      toast.error("No se pudo cerrar sesion", {
+        description: error?.code || error?.message || "Error desconocido",
+      });
+    }
+  };
 
   return (
     <>
@@ -60,7 +101,7 @@ export const Header = () => {
 
               {/* Wishlist */}
               <Button variant="ghost" size="icon" asChild>
-                <Link href="/favoritos">
+                <Link href={favoritesHref}>
                   <Heart className="h-5 w-5" />
                 </Link>
               </Button>
@@ -81,16 +122,79 @@ export const Header = () => {
               </Button>
 
               {/* Account */}
-              <Button
-                variant="ghost"
-                size="icon"
-                asChild
-                className="hidden md:flex"
-              >
-                <Link href="/admin">
-                  <User className="h-5 w-5" />
-                </Link>
-              </Button>
+              <div className="relative hidden md:flex" ref={profileRef}>
+                {user ? (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="overflow-hidden rounded-full"
+                      onClick={() => setProfileMenuOpen((prev) => !prev)}
+                    >
+                      {user.photoURL && !avatarFailed ? (
+                        <img
+                          src={user.photoURL}
+                          alt={user.displayName || "Perfil"}
+                          referrerPolicy="no-referrer"
+                          onError={() => setAvatarFailed(true)}
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold">
+                          {userInitial}
+                        </div>
+                      )}
+                    </Button>
+
+                    {profileMenuOpen && (
+                      <div className="absolute right-0 top-12 w-72 rounded-lg border bg-background p-4 shadow-lg z-50">
+                        <div className="flex items-center gap-3 mb-4">
+                          {user.photoURL && !avatarFailed ? (
+                            <img
+                              src={user.photoURL}
+                              alt={user.displayName || "Perfil"}
+                              referrerPolicy="no-referrer"
+                              onError={() => setAvatarFailed(true)}
+                              className="h-14 w-14 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center text-lg font-semibold">
+                              {userInitial}
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <p className="font-semibold truncate">
+                              {user.displayName || "Usuario"}
+                            </p>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {user.email || ""}
+                            </p>
+                          </div>
+                        </div>
+
+                        <Button
+                          variant="outline"
+                          className="w-full hover:bg-red-600 hover:text-white hover:border-red-600"
+                          onClick={handleLogout}
+                        >
+                          Cerrar sesion
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    asChild
+                    className="hidden md:flex"
+                  >
+                    <Link href="/login">
+                      <User className="h-5 w-5" />
+                    </Link>
+                  </Button>
+                )}
+              </div>
 
               {/* Mobile menu */}
               <Button variant="ghost" size="icon" className="md:hidden">

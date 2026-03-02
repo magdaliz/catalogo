@@ -17,6 +17,9 @@ import { Product } from "@/types/product";
 import { useCartStore } from "@/store/cartStore";
 import { formatPrice } from "@/lib/utils/formatters";
 import { toast } from "sonner";
+import { useFavorites } from "@/lib/favorites/FavoritesContext";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface ProductQuickViewProps {
   product: Product;
@@ -28,6 +31,10 @@ export const ProductQuickView = ({
   onClose,
 }: ProductQuickViewProps) => {
   const { addItem } = useCartStore();
+  const { user } = useAuth();
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const router = useRouter();
+  const favorite = isFavorite(product.id);
 
   const handleAddToCart = () => {
     addItem(product, 1);
@@ -35,6 +42,26 @@ export const ProductQuickView = ({
       description: product.nombre,
     });
     onClose();
+  };
+
+  const handleFavorite = async () => {
+    if (!user) {
+      onClose();
+      router.push("/login?redirect=/favoritos");
+      return;
+    }
+
+    try {
+      await toggleFavorite(product);
+      toast.success(
+        favorite ? "Quitado de favoritos" : "Agregado a favoritos",
+      );
+    } catch (error: any) {
+      console.error("toggleFavorite error:", error);
+      toast.error("No se pudo actualizar favoritos", {
+        description: error?.code || error?.message || "Error desconocido",
+      });
+    }
   };
 
   return (
@@ -117,8 +144,10 @@ export const ProductQuickView = ({
                     Ver detalles
                   </Link>
                 </Button>
-                <Button variant="outline" size="lg">
-                  <Heart className="mr-2 h-4 w-4" />
+                <Button variant="outline" size="lg" onClick={handleFavorite}>
+                  <Heart
+                    className={`mr-2 h-4 w-4 ${favorite ? "fill-current text-red-500" : ""}`}
+                  />
                   Favoritos
                 </Button>
               </div>

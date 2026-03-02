@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import { useState } from "react";
+import { AuthProvider } from "@/lib/auth/AuthContext";
+import { FavoritesProvider } from "@/lib/favorites/FavoritesContext";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -27,8 +29,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
         enableSystem
         disableTransitionOnChange
       >
-        {children}
-        <Toaster position="top-right" richColors />
+        <AuthProvider>
+          <FavoritesProvider>
+            {children}
+            <Toaster position="top-right" richColors />
+          </FavoritesProvider>
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

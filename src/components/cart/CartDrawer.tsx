@@ -15,10 +15,12 @@ import { CartItem } from "./CartItem";
 import { formatPrice } from "@/lib/utils/formatters";
 import { ShoppingBag, X } from "lucide-react";
 import Link from "next/link";
+import { getWhatsAppCartURL } from "@/lib/utils/whatsapp";
 
 export const CartDrawer = () => {
   const { items, isOpen, closeCart, getTotal, clearCart } = useCartStore();
   const total = getTotal();
+  const whatsappURL = getWhatsAppCartURL(items);
 
   return (
     <Sheet open={isOpen} onOpenChange={closeCart}>
@@ -68,7 +70,13 @@ export const CartDrawer = () => {
               {/* Buttons */}
               <div className="space-y-2">
                 <Button className="w-full" size="lg" asChild>
-                  <Link href="/carrito">Ver carrito completo</Link>
+                  <a
+                    href={whatsappURL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Finalizar por WhatsApp
+                  </a>
                 </Button>
                 <Button
                   variant="outline"
