@@ -13,7 +13,7 @@ import { toast } from "sonner";
 
 export const Header = () => {
   const { items, toggleCart, getItemCount } = useCartStore();
-  const { user, logout } = useAuth();
+  const { user, isAdmin, logout } = useAuth();
   const itemCount = getItemCount();
   const favoritesHref = user ? "/favoritos" : "/login?redirect=/favoritos";
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -176,6 +176,16 @@ export const Header = () => {
                             </p>
                           </div>
                         </div>
+
+                        {isAdmin && (
+                          <Button
+                            variant="outline"
+                            className="w-full mb-2"
+                            asChild
+                          >
+                            <Link href="/admin">Portal admin</Link>
+                          </Button>
+                        )}
 
                         <Button
                           variant="outline"

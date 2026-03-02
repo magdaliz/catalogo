@@ -144,18 +144,20 @@ export const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
           </h3>
 
           {/* Precio */}
-          <div className="flex flex-col">
+          <div className="flex items-end justify-between gap-2 min-h-8">
             {hasProductDiscount ? (
               <>
-                <span className="font-bold text-lg text-black">
+                <span className="font-bold text-lg text-black leading-none">
                   {formatPrice(finalPrice)}
                 </span>
-                <span className="text-sm text-red-600 line-through">
+                <span className="text-sm text-red-600 line-through leading-none">
                   {formatPrice(product.precio)}
                 </span>
               </>
             ) : (
-              <span className="font-bold text-lg">{formatPrice(product.precio)}</span>
+              <span className="font-bold text-lg leading-none">
+                {formatPrice(product.precio)}
+              </span>
             )}
           </div>
         </div>

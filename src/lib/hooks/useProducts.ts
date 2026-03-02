@@ -404,7 +404,18 @@ export const useColecciones = () => {
   return useQuery({
     queryKey: ["colecciones"],
     queryFn: async () => {
-      const snapshot = await getDocs(collection(db, "productos")); // â† CORREGIDO
+      const adminCollectionsSnapshot = await getDocs(collection(db, "colecciones"));
+      const adminCollections = adminCollectionsSnapshot.docs
+        .map((docSnap) => docSnap.data())
+        .filter((d) => d?.activa !== false && typeof d?.nombre === "string")
+        .map((d) => String(d.nombre).trim())
+        .filter(Boolean);
+
+      if (adminCollections.length > 0) {
+        return Array.from(new Set(adminCollections)).sort();
+      }
+
+      const snapshot = await getDocs(collection(db, "productos"));
       const colecciones = new Set<string>();
 
       snapshot.docs.forEach((docSnap) => {

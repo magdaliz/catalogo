@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
   GoogleAuthProvider,
   User,
+  getIdTokenResult,
   onAuthStateChanged,
   signInWithPopup,
   signOut,
@@ -12,20 +13,29 @@ import { auth } from "@/lib/firebase/config";
 
 interface AuthContextValue {
   user: User | null;
+  isAdmin: boolean;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
+  refreshClaims: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (nextUser) => {
+    const unsub = onAuthStateChanged(auth, async (nextUser) => {
       setUser(nextUser);
+      if (nextUser) {
+        const token = await getIdTokenResult(nextUser, true);
+        setIsAdmin(!!token.claims.admin);
+      } else {
+        setIsAdmin(false);
+      }
       setLoading(false);
     });
 
@@ -42,9 +52,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await signOut(auth);
   };
 
+  const refreshClaims = async () => {
+    if (!auth.currentUser) {
+      setIsAdmin(false);
+      return;
+    }
+    const token = await getIdTokenResult(auth.currentUser, true);
+    setIsAdmin(!!token.claims.admin);
+  };
+
   const value = useMemo(
-    () => ({ user, loading, signInWithGoogle, logout }),
-    [user, loading],
+    () => ({ user, isAdmin, loading, signInWithGoogle, logout, refreshClaims }),
+    [user, isAdmin, loading],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -57,4 +76,3 @@ export function useAuth() {
   }
   return ctx;
 }
-
