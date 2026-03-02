@@ -1,11 +1,16 @@
-// src/components/products/ProductFilters.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
+import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
 import {
   Sheet,
   SheetContent,
@@ -13,23 +18,29 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { SlidersHorizontal } from "lucide-react";
 import { ProductFilters as Filters } from "@/types/product";
-import { useProductTypes, useColecciones } from "@/lib/hooks/useProducts";
+import { useColecciones, useProductTypes } from "@/lib/hooks/useProducts";
 
 interface ProductFiltersProps {
   onFilterChange: (filters: Filters) => void;
   initialFilters?: Filters;
 }
 
+const PRICE_MIN = 0;
+const PRICE_MAX = 500000;
+const PRICE_STEP = 5000;
+type DragTarget = "min" | "max" | null;
+
 export const ProductFilters = ({
   onFilterChange,
   initialFilters,
 }: ProductFiltersProps) => {
-  // Estados internos (NO se aplican hasta presionar el botón)
+  const lastSyncedFiltersRef = useRef("");
+  const trackRef = useRef<HTMLDivElement | null>(null);
+
   const [priceRange, setPriceRange] = useState<[number, number]>([
-    initialFilters?.minPrecio ?? 0,
-    initialFilters?.maxPrecio ?? 500000,
+    initialFilters?.minPrecio ?? PRICE_MIN,
+    initialFilters?.maxPrecio ?? PRICE_MAX,
   ]);
   const [selectedTipo, setSelectedTipo] = useState<string | undefined>(
     initialFilters?.tipo,
@@ -37,58 +48,127 @@ export const ProductFilters = ({
   const [selectedColeccion, setSelectedColeccion] = useState<
     string | undefined
   >(initialFilters?.coleccion);
+  const [dragTarget, setDragTarget] = useState<DragTarget>(null);
 
-  // Obtener tipos y colecciones desde Firestore (ya sin duplicados)
   const { data: tipos = [] } = useProductTypes();
   const { data: colecciones = [] } = useColecciones();
 
-  // Sincronizar con filtros externos si cambian
   useEffect(() => {
-    if (initialFilters) {
-      setPriceRange([
-        initialFilters.minPrecio ?? 0,
-        initialFilters.maxPrecio ?? 500000,
-      ]);
-      setSelectedTipo(initialFilters.tipo);
-      setSelectedColeccion(initialFilters.coleccion);
-    }
+    const snapshot = JSON.stringify({
+      minPrecio: initialFilters?.minPrecio ?? PRICE_MIN,
+      maxPrecio: initialFilters?.maxPrecio ?? PRICE_MAX,
+      tipo: initialFilters?.tipo ?? null,
+      coleccion: initialFilters?.coleccion ?? null,
+    });
+
+    if (lastSyncedFiltersRef.current === snapshot) return;
+    lastSyncedFiltersRef.current = snapshot;
+
+    setPriceRange([
+      initialFilters?.minPrecio ?? PRICE_MIN,
+      initialFilters?.maxPrecio ?? PRICE_MAX,
+    ]);
+    setSelectedTipo(initialFilters?.tipo);
+    setSelectedColeccion(initialFilters?.coleccion);
   }, [initialFilters]);
 
-  // Aplicar filtros (llamar a Firestore)
   const applyFilters = () => {
     const filters: Filters = {};
 
-    if (selectedTipo) {
-      filters.tipo = selectedTipo;
-    }
-
-    if (selectedColeccion) {
-      filters.coleccion = selectedColeccion;
-    }
-
-    // Solo agregar precio si es diferente al rango completo
-    if (priceRange[0] > 0) {
-      filters.minPrecio = priceRange[0];
-    }
-
-    if (priceRange[1] < 500000) {
-      filters.maxPrecio = priceRange[1];
-    }
+    if (selectedTipo) filters.tipo = selectedTipo;
+    if (selectedColeccion) filters.coleccion = selectedColeccion;
+    if (priceRange[0] > PRICE_MIN) filters.minPrecio = priceRange[0];
+    if (priceRange[1] < PRICE_MAX) filters.maxPrecio = priceRange[1];
 
     onFilterChange(filters);
   };
 
-  // Limpiar filtros
   const clearFilters = () => {
-    setPriceRange([0, 500000]);
+    setPriceRange([PRICE_MIN, PRICE_MAX]);
     setSelectedTipo(undefined);
     setSelectedColeccion(undefined);
     onFilterChange({});
   };
 
+  const snapPrice = useCallback((value: number) => {
+    const snapped = Math.round(value / PRICE_STEP) * PRICE_STEP;
+    return Math.max(PRICE_MIN, Math.min(PRICE_MAX, snapped));
+  }, []);
+
+  const priceFromClientX = useCallback(
+    (clientX: number) => {
+      const track = trackRef.current;
+      if (!track) return PRICE_MIN;
+
+      const rect = track.getBoundingClientRect();
+      const ratio = (clientX - rect.left) / rect.width;
+      const raw = PRICE_MIN + (PRICE_MAX - PRICE_MIN) * ratio;
+      return snapPrice(raw);
+    },
+    [snapPrice],
+  );
+
+  const updateDragValue = useCallback(
+    (clientX: number, target: "min" | "max") => {
+      const nextValue = priceFromClientX(clientX);
+      setPriceRange((prev) => {
+        if (target === "min") {
+          return [Math.min(nextValue, prev[1] - PRICE_STEP), prev[1]];
+        }
+        return [prev[0], Math.max(nextValue, prev[0] + PRICE_STEP)];
+      });
+    },
+    [priceFromClientX],
+  );
+
+  useEffect(() => {
+    if (!dragTarget) return;
+
+    const handlePointerMove = (event: PointerEvent) => {
+      updateDragValue(event.clientX, dragTarget);
+    };
+
+    const handlePointerUp = () => {
+      setDragTarget(null);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [dragTarget, updateDragValue]);
+
+  const startDrag =
+    (target: "min" | "max") => (event: ReactPointerEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+      setDragTarget(target);
+      updateDragValue(event.clientX, target);
+    };
+
+  const handleTrackPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const clickedValue = priceFromClientX(event.clientX);
+    const distanceToMin = Math.abs(clickedValue - priceRange[0]);
+    const distanceToMax = Math.abs(clickedValue - priceRange[1]);
+    const target: "min" | "max" =
+      distanceToMin <= distanceToMax ? "min" : "max";
+
+    setDragTarget(target);
+    updateDragValue(event.clientX, target);
+  };
+
+  const minPercent =
+    ((priceRange[0] - PRICE_MIN) / (PRICE_MAX - PRICE_MIN)) * 100;
+  const maxPercent =
+    ((priceRange[1] - PRICE_MIN) / (PRICE_MAX - PRICE_MIN)) * 100;
+  const selectedWidthPercent = Math.max(maxPercent - minPercent, 0);
+
   const FilterContent = () => (
     <div className="space-y-6">
-      {/* Tipos (Categorías) */}
       <div>
         <h3 className="font-semibold mb-3">Tipo de producto</h3>
         <div className="space-y-2 max-h-64 overflow-y-auto">
@@ -97,9 +177,9 @@ export const ProductFilters = ({
               <Checkbox
                 id={`tipo-${tipo}`}
                 checked={selectedTipo === tipo}
-                onCheckedChange={(checked) => {
-                  setSelectedTipo(checked ? tipo : undefined);
-                }}
+                onCheckedChange={(checked) =>
+                  setSelectedTipo(checked ? tipo : undefined)
+                }
               />
               <Label
                 htmlFor={`tipo-${tipo}`}
@@ -112,19 +192,18 @@ export const ProductFilters = ({
         </div>
       </div>
 
-      {/* Colecciones */}
       {colecciones.length > 0 && (
         <div>
-          <h3 className="font-semibold mb-3">Colección</h3>
+          <h3 className="font-semibold mb-3">Coleccion</h3>
           <div className="space-y-2 max-h-48 overflow-y-auto">
             {colecciones.map((coleccion) => (
               <div key={coleccion} className="flex items-center space-x-2">
                 <Checkbox
                   id={`coleccion-${coleccion}`}
                   checked={selectedColeccion === coleccion}
-                  onCheckedChange={(checked) => {
-                    setSelectedColeccion(checked ? coleccion : undefined);
-                  }}
+                  onCheckedChange={(checked) =>
+                    setSelectedColeccion(checked ? coleccion : undefined)
+                  }
                 />
                 <Label
                   htmlFor={`coleccion-${coleccion}`}
@@ -138,26 +217,43 @@ export const ProductFilters = ({
         </div>
       )}
 
-      {/* Precio - SLIDER FLUIDO */}
       <div>
         <h3 className="font-semibold mb-3">Rango de precio</h3>
 
-        {/* Slider con dos thumbs, smooth dragging */}
-        <div className="px-2">
-          <Slider
-            value={priceRange}
-            onValueChange={(value) => {
-              // Actualiza el estado local inmediatamente (drag fluido)
-              setPriceRange(value as [number, number]);
-            }}
-            min={0}
-            max={500000}
-            step={5000} // Paso de 5000 COP para que sea smooth pero razonable
-            className="mb-6"
-          />
+        <div
+          className="relative h-10 mb-2 touch-none select-none cursor-pointer"
+          onPointerDown={handleTrackPointerDown}
+        >
+          <div
+            ref={trackRef}
+            className="absolute left-2 right-2 top-1/2 -translate-y-1/2 h-1.5"
+          >
+            <div className="absolute inset-0 rounded-full bg-muted" />
+            <div
+              className="absolute h-full rounded-full bg-primary"
+              style={{
+                left: `${minPercent}%`,
+                width: `${selectedWidthPercent}%`,
+              }}
+            />
+            <button
+              type="button"
+              aria-label="Precio minimo"
+              onPointerDown={startDrag("min")}
+              className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 h-4 w-4 rounded-full border border-primary bg-white shadow-sm cursor-grab active:cursor-grabbing"
+              style={{ left: `${minPercent}%` }}
+            />
+
+            <button
+              type="button"
+              aria-label="Precio maximo"
+              onPointerDown={startDrag("max")}
+              className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 h-4 w-4 rounded-full border border-primary bg-white shadow-sm cursor-grab active:cursor-grabbing"
+              style={{ left: `${maxPercent}%` }}
+            />
+          </div>
         </div>
 
-        {/* Mostrar valores actuales */}
         <div className="flex justify-between text-sm text-muted-foreground">
           <span className="font-medium">
             ${priceRange[0].toLocaleString("es-CO")}
@@ -167,13 +263,11 @@ export const ProductFilters = ({
           </span>
         </div>
 
-        {/* Ayuda visual */}
         <p className="text-xs text-muted-foreground mt-2">
           Arrastra los controles para ajustar el rango
         </p>
       </div>
 
-      {/* Botones */}
       <div className="space-y-2 pt-4 border-t">
         <Button onClick={applyFilters} className="w-full" size="lg">
           Aplicar filtros
@@ -187,12 +281,10 @@ export const ProductFilters = ({
 
   return (
     <>
-      {/* Desktop */}
       <div className="hidden lg:block w-64 space-y-6">
         <FilterContent />
       </div>
 
-      {/* Mobile */}
       <Sheet>
         <SheetTrigger asChild className="lg:hidden">
           <Button variant="outline" size="sm">

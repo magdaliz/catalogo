@@ -115,16 +115,37 @@ export const ProductsPageContent = ({
   const activeFiltersCount = Object.values(filters).filter(Boolean).length;
   const hasActiveFilters = activeFiltersCount > 0;
 
+  const spTipo = sp.get("tipo");
+  const spColeccion = sp.get("coleccion");
+  const spNuevo = sp.get("nuevo");
+  const spSearch = sp.get("search");
+  const spMinPrecio = sp.get("minPrecio");
+  const spMaxPrecio = sp.get("maxPrecio");
+
   useEffect(() => {
-    setFilters({
-      tipo: sp.get("tipo") ?? undefined,
-      coleccion: sp.get("coleccion") ?? undefined,
-      nuevo: sp.get("nuevo") === "1" ? true : undefined,
-      search: sp.get("search") ?? undefined,
-      minPrecio: sp.get("minPrecio") ? Number(sp.get("minPrecio")) : undefined,
-      maxPrecio: sp.get("maxPrecio") ? Number(sp.get("maxPrecio")) : undefined,
+    const nextFilters: Filters = {
+      tipo: spTipo ?? undefined,
+      coleccion: spColeccion ?? undefined,
+      nuevo: spNuevo === "1" ? true : undefined,
+      search: spSearch ?? undefined,
+      minPrecio: spMinPrecio ? Number(spMinPrecio) : undefined,
+      maxPrecio: spMaxPrecio ? Number(spMaxPrecio) : undefined,
+    };
+
+    setFilters((prev) => {
+      if (
+        prev.tipo === nextFilters.tipo &&
+        prev.coleccion === nextFilters.coleccion &&
+        prev.nuevo === nextFilters.nuevo &&
+        prev.search === nextFilters.search &&
+        prev.minPrecio === nextFilters.minPrecio &&
+        prev.maxPrecio === nextFilters.maxPrecio
+      ) {
+        return prev;
+      }
+      return nextFilters;
     });
-  }, [sp]);
+  }, [spTipo, spColeccion, spNuevo, spSearch, spMinPrecio, spMaxPrecio]);
 
   return (
     <div className="space-y-6">
