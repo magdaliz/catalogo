@@ -11,8 +11,8 @@ export default function HomePage() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400" />
+      <section className="relative h-[70vh] min-h-125 flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-br from-purple-600 via-pink-500 to-orange-400" />
         <div className="absolute inset-0 bg-black/20" />
 
         <div className="relative z-10 container mx-auto px-4 text-center text-white">
@@ -123,7 +123,7 @@ export default function HomePage() {
               href="/productos?tipo=aretes"
               className="group relative h-64 rounded-lg overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-pink-400" />
+              <div className="absolute inset-0 bg-linear-to-br from-purple-400 to-pink-400" />
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <h3 className="text-white text-2xl font-bold">Aretes</h3>
@@ -134,7 +134,7 @@ export default function HomePage() {
               href="/productos?tipo=collares"
               className="group relative h-64 rounded-lg overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-pink-400 to-orange-400" />
+              <div className="absolute inset-0 bg-linear-to-br from-pink-400 to-orange-400" />
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <h3 className="text-white text-2xl font-bold">Collares</h3>
@@ -145,7 +145,7 @@ export default function HomePage() {
               href="/productos?tipo=pulseras"
               className="group relative h-64 rounded-lg overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-orange-400 to-yellow-400" />
+              <div className="absolute inset-0 bg-linear-to-br from-orange-400 to-yellow-400" />
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <h3 className="text-white text-2xl font-bold">Pulseras</h3>
@@ -156,7 +156,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-purple-600 to-pink-600">
+      <section className="py-20 bg-linear-to-r from-purple-600 to-pink-600">
         <div className="container mx-auto px-4 text-center text-white">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
             ¿Listo para renovar tu estilo?

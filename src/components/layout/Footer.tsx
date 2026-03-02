@@ -25,7 +25,7 @@ export const Footer = () => {
                 <Facebook className="h-5 w-5" />
               </Link>
               <Link
-                href="https://instagram.com"
+                href="https://www.instagram.com/lizbetmagda/?theme=dark"
                 target="_blank"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >

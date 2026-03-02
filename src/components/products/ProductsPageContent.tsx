@@ -1,11 +1,10 @@
-// src/components/products/ProductsPageContent.tsx (CON CONTADOR CORRECTO)
+// src/components/products/ProductsPageContent.tsx
 "use client";
 
 import { useState } from "react";
 import { ProductGrid } from "./ProductGrid";
 import { ProductFilters } from "./ProductFilters";
 import { ProductSkeleton } from "./ProductSkeleton";
-import { FeaturedCategories } from "./FeaturedCategories";
 import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/shared/SearchBar";
 import {
@@ -20,6 +19,8 @@ import { X, SlidersHorizontal, Grid3x3, List } from "lucide-react";
 import { ProductFilters as Filters, SortOption } from "@/types/product";
 import { useProducts } from "@/lib/hooks/useProducts";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 interface ProductsPageContentProps {
   searchParams: {
@@ -36,11 +37,16 @@ export const ProductsPageContent = ({
   const router = useRouter();
 
   // Estados
-  const [filters, setFilters] = useState<Filters>({
-    tipo: searchParams.tipo,
-    coleccion: searchParams.coleccion,
-    search: searchParams.search,
-  });
+  const sp = useSearchParams();
+
+  const [filters, setFilters] = useState<Filters>(() => ({
+    tipo: sp.get("tipo") ?? undefined,
+    coleccion: sp.get("coleccion") ?? undefined,
+    search: sp.get("search") ?? undefined,
+    minPrecio: sp.get("minPrecio") ? Number(sp.get("minPrecio")) : undefined,
+    maxPrecio: sp.get("maxPrecio") ? Number(sp.get("maxPrecio")) : undefined,
+  }));
+
   const [sortBy, setSortBy] = useState<SortOption>(
     (searchParams.ordenar as SortOption) || "newest",
   );
@@ -69,7 +75,7 @@ export const ProductsPageContent = ({
     router.push(url);
   };
 
-  // Manejar cambio de filtros
+  // Manejar cambio de filtros (se llama desde ProductFilters al presionar "Aplicar")
   const handleFilterChange = (newFilters: Filters) => {
     setFilters(newFilters);
     updateURL(newFilters, sortBy);
@@ -101,15 +107,22 @@ export const ProductsPageContent = ({
   const activeFiltersCount = Object.values(filters).filter(Boolean).length;
   const hasActiveFilters = activeFiltersCount > 0;
 
+  useEffect(() => {
+    setFilters({
+      tipo: sp.get("tipo") ?? undefined,
+      coleccion: sp.get("coleccion") ?? undefined,
+      search: sp.get("search") ?? undefined,
+      minPrecio: sp.get("minPrecio") ? Number(sp.get("minPrecio")) : undefined,
+      maxPrecio: sp.get("maxPrecio") ? Number(sp.get("maxPrecio")) : undefined,
+    });
+  }, [sp]);
+
   return (
-    <div className="space-y-8">
-      {/* Categorías destacadas - Solo si no hay filtros activos */}
-      {!hasActiveFilters && (
-        <div>
-          <h2 className="text-2xl font-bold mb-4">Explora por categoría</h2>
-          <FeaturedCategories />
-        </div>
-      )}
+    <div className="space-y-6">
+      {/* ========================================
+          REMOVIDO: Bloque "Explora por categoría"
+          (ya existe el filtro por tipo)
+          ======================================== */}
 
       {/* Barra de búsqueda y controles */}
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
@@ -161,7 +174,7 @@ export const ProductsPageContent = ({
 
           {/* Ordenamiento */}
           <Select value={sortBy} onValueChange={handleSortChange}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-45">
               <SelectValue placeholder="Ordenar por" />
             </SelectTrigger>
             <SelectContent>
@@ -219,12 +232,12 @@ export const ProductsPageContent = ({
             </Badge>
           )}
 
-          {filters.minPrecio && filters.maxPrecio && (
+          {(filters.minPrecio || filters.maxPrecio) && (
             <Badge variant="secondary" className="gap-1 pl-3 pr-2">
               Precio:{" "}
               <span className="font-semibold">
-                ${filters.minPrecio.toLocaleString()} - $
-                {filters.maxPrecio.toLocaleString()}
+                ${(filters.minPrecio ?? 0).toLocaleString("es-CO")} - $
+                {(filters.maxPrecio ?? 500000).toLocaleString("es-CO")}
               </span>
               <button
                 onClick={() => {
@@ -251,7 +264,7 @@ export const ProductsPageContent = ({
         </div>
       )}
 
-      {/* Contador de resultados - CORREGIDO */}
+      {/* Contador de resultados */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
           {isLoading ? (
@@ -263,7 +276,7 @@ export const ProductsPageContent = ({
               </span>{" "}
               producto{totalProducts !== 1 ? "s" : ""}
               {data?.pages[data.pages.length - 1]?.hasMore && (
-                <span> (mostrando {totalProducts}, hay más disponibles)</span>
+                <span> (hay más disponibles)</span>
               )}
             </>
           )}
@@ -278,7 +291,7 @@ export const ProductsPageContent = ({
           ${showFilters ? "block" : "hidden"} 
           md:block 
           w-full md:w-64 
-          flex-shrink-0
+          shrink-0
         `}
         >
           <div className="sticky top-4">

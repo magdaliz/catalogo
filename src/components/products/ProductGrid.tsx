@@ -50,8 +50,15 @@ export const ProductGrid = ({
   if (error) {
     return (
       <div className="text-center py-20">
-        <p className="text-muted-foreground mb-4">Error al cargar productos</p>
-        <Button variant="outline" onClick={() => window.location.reload()}>
+        <p className="text-muted-foreground mb-2">Error al cargar productos</p>
+        <pre className="text-xs opacity-80 whitespace-pre-wrap max-w-2xl mx-auto">
+          {JSON.stringify(error, null, 2)}
+        </pre>
+        <Button
+          variant="outline"
+          onClick={() => window.location.reload()}
+          className="mt-4"
+        >
           Reintentar
         </Button>
       </div>
@@ -107,7 +114,7 @@ export const ProductGrid = ({
             disabled={isFetchingNextPage}
             size="lg"
             variant="outline"
-            className="min-w-[200px]"
+            className="min-w-50"
           >
             {isFetchingNextPage ? (
               <>

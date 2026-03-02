@@ -23,7 +23,7 @@ export default function ProductosPage({ searchParams }: ProductsPageProps) {
   return (
     <div className="min-h-screen bg-background">
       {/* Header de la página */}
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+      <div className="bg-linear-to-r from-purple-600 to-pink-600 text-white">
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Nuestra Colección
