@@ -7,6 +7,8 @@ export interface Product {
   precio: number;
   tipo: string; // ej: "aretes", "collares", "pulseras"
   coleccion: string; // ej: "Personalizados", "Premium", etc.
+  nuevo?: boolean;
+  createdAt?: Date;
   imagen: string;
   imagenAlt?: string;
 }
@@ -61,6 +63,7 @@ export interface WishlistItem {
 export interface ProductFilters {
   tipo?: string; // Filtrar por tipo (categoría)
   coleccion?: string; // Filtrar por colección
+  nuevo?: boolean; // Filtrar productos nuevos
   minPrecio?: number;
   maxPrecio?: number;
   search?: string; // Búsqueda por nombre

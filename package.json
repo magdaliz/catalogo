@@ -6,14 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "firebase:set-nuevo-all": "node scripts/set-nuevo-all.js",
+    "firebase:set-createdat-nuevo": "node scripts/set-createdat-nuevo-this-year.js"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "firebase": "^12.9.0",
-    "firebase-admin": "^13.6.1",
+    "firebase-admin": "^13.7.0",
     "framer-motion": "^12.34.0",
     "lucide-react": "^0.564.0",
     "next": "16.1.6",

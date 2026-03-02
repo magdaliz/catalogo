@@ -39,6 +39,7 @@ export const useProducts = (
         // Filtro por colección
         if (filters?.coleccion)
           q = query(q, where("coleccion", "==", filters.coleccion));
+        if (filters?.nuevo) q = query(q, where("nuevo", "==", true));
 
         const hasMinPrice =
           filters?.minPrecio !== undefined && filters.minPrecio > 0;
@@ -78,6 +79,8 @@ export const useProducts = (
             precio: d.precio,
             tipo: d.tipo,
             coleccion: d.coleccion,
+            nuevo: d.nuevo,
+            createdAt: d.createdAt?.toDate?.() ?? d.createdAt,
             imagen: d.imagen,
             imagenAlt: d.imagenAlt,
           } as Product;

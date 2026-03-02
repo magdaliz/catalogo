@@ -59,13 +59,18 @@ export const ProductListView = ({
                   sizes="128px"
                 />
 
-                {product.coleccion && (
-                  <div className="absolute top-2 left-2">
+                <div className="absolute top-2 left-2 flex flex-col gap-1">
+                  {product.coleccion && (
                     <Badge className="bg-purple-500 text-xs">
                       {product.coleccion}
                     </Badge>
-                  </div>
-                )}
+                  )}
+                  {product.nuevo && (
+                    <Badge variant="destructive" className="text-xs">
+                      Nuevo
+                    </Badge>
+                  )}
+                </div>
               </div>
 
               {/* Info */}

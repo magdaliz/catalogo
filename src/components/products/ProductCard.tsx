@@ -50,6 +50,7 @@ export const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
                 {product.coleccion}
               </Badge>
             )}
+            {product.nuevo && <Badge variant="destructive">Nuevo</Badge>}
           </div>
 
           {/* Actions */}

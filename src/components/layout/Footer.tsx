@@ -55,7 +55,7 @@ export const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/productos/categoria/nuevos"
+                  href="/productos?nuevo=1"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Nuevos ingresos

@@ -14,6 +14,7 @@ interface ProductsPageProps {
   searchParams: {
     tipo?: string;
     coleccion?: string;
+    nuevo?: string;
     search?: string;
     ordenar?: string;
   };

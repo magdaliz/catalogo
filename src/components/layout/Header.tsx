@@ -33,7 +33,7 @@ export const Header = () => {
                 Productos
               </Link>
               <Link
-                href="/productos/categoria/nuevos"
+                href="/productos?nuevo=1"
                 className="hover:text-primary transition-colors"
               >
                 Nuevos

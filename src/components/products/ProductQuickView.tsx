@@ -2,10 +2,9 @@
 
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { X, ShoppingCart, Heart, ExternalLink } from "lucide-react";
+import { ShoppingCart, Heart, ExternalLink } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -60,13 +59,14 @@ export const ProductQuickView = ({
               />
 
               {/* Badge de colección */}
-              {product.coleccion && (
-                <div className="absolute top-3 left-3">
+              <div className="absolute top-3 left-3 flex flex-col gap-2">
+                {product.coleccion && (
                   <Badge className="bg-purple-500 hover:bg-purple-600">
                     {product.coleccion}
                   </Badge>
-                </div>
-              )}
+                )}
+                {product.nuevo && <Badge variant="destructive">Nuevo</Badge>}
+              </div>
             </div>
           </div>
 

@@ -26,6 +26,7 @@ interface ProductsPageContentProps {
   searchParams: {
     tipo?: string;
     coleccion?: string;
+    nuevo?: string;
     search?: string;
     ordenar?: string;
   };
@@ -42,6 +43,7 @@ export const ProductsPageContent = ({
   const [filters, setFilters] = useState<Filters>(() => ({
     tipo: sp.get("tipo") ?? undefined,
     coleccion: sp.get("coleccion") ?? undefined,
+    nuevo: sp.get("nuevo") === "1" ? true : undefined,
     search: sp.get("search") ?? undefined,
     minPrecio: sp.get("minPrecio") ? Number(sp.get("minPrecio")) : undefined,
     maxPrecio: sp.get("maxPrecio") ? Number(sp.get("maxPrecio")) : undefined,
@@ -66,6 +68,7 @@ export const ProductsPageContent = ({
 
     if (newFilters.tipo) params.set("tipo", newFilters.tipo);
     if (newFilters.coleccion) params.set("coleccion", newFilters.coleccion);
+    if (newFilters.nuevo) params.set("nuevo", "1");
     if (newFilters.search) params.set("search", newFilters.search);
     if (newSort) params.set("ordenar", newSort);
 
@@ -77,8 +80,13 @@ export const ProductsPageContent = ({
 
   // Manejar cambio de filtros (se llama desde ProductFilters al presionar "Aplicar")
   const handleFilterChange = (newFilters: Filters) => {
-    setFilters(newFilters);
-    updateURL(newFilters, sortBy);
+    const nextFilters =
+      filters.nuevo && newFilters.nuevo === undefined
+        ? { ...newFilters, nuevo: true }
+        : newFilters;
+
+    setFilters(nextFilters);
+    updateURL(nextFilters, sortBy);
   };
 
   // Manejar cambio de ordenamiento
@@ -111,6 +119,7 @@ export const ProductsPageContent = ({
     setFilters({
       tipo: sp.get("tipo") ?? undefined,
       coleccion: sp.get("coleccion") ?? undefined,
+      nuevo: sp.get("nuevo") === "1" ? true : undefined,
       search: sp.get("search") ?? undefined,
       minPrecio: sp.get("minPrecio") ? Number(sp.get("minPrecio")) : undefined,
       maxPrecio: sp.get("maxPrecio") ? Number(sp.get("maxPrecio")) : undefined,
@@ -225,6 +234,18 @@ export const ProductsPageContent = ({
               <span className="font-semibold">"{filters.search}"</span>
               <button
                 onClick={() => removeFilter("search")}
+                className="ml-1 hover:text-destructive transition-colors"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          )}
+
+          {filters.nuevo && (
+            <Badge variant="secondary" className="gap-1 pl-3 pr-2">
+              Nuevos
+              <button
+                onClick={() => removeFilter("nuevo")}
                 className="ml-1 hover:text-destructive transition-colors"
               >
                 <X className="h-3 w-3" />
