@@ -33,8 +33,9 @@ export default function HomePage() {
               size="lg"
               variant="outline"
               className="text-lg bg-white/10 backdrop-blur-sm border-white text-white hover:bg-white/20"
+              asChild
             >
-              Colecciones
+              <Link href="/colecciones">Colecciones</Link>
             </Button>
           </div>
         </div>
@@ -131,18 +132,18 @@ export default function HomePage() {
             </Link>
 
             <Link
-              href="/productos?tipo=collares"
+              href="/productos?tipo=Muñeco"
               className="group relative h-64 rounded-lg overflow-hidden"
             >
               <div className="absolute inset-0 bg-linear-to-br from-pink-400 to-orange-400" />
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <h3 className="text-white text-2xl font-bold">Collares</h3>
+                <h3 className="text-white text-2xl font-bold">Muñecos</h3>
               </div>
             </Link>
 
             <Link
-              href="/productos?tipo=pulseras"
+              href="/productos?tipo=pulsera"
               className="group relative h-64 rounded-lg overflow-hidden"
             >
               <div className="absolute inset-0 bg-linear-to-br from-orange-400 to-yellow-400" />
