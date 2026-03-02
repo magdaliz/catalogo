@@ -18,6 +18,7 @@ export const Header = () => {
   const favoritesHref = user ? "/favoritos" : "/login?redirect=/favoritos";
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
   const profileRef = useRef<HTMLDivElement | null>(null);
 
   const userInitial = (user?.displayName?.trim()?.charAt(0) ||
@@ -28,6 +29,10 @@ export const Header = () => {
   useEffect(() => {
     setAvatarFailed(false);
   }, [user?.uid, user?.photoURL]);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   useEffect(() => {
     const onClickOutside = (event: MouseEvent) => {
@@ -114,7 +119,7 @@ export const Header = () => {
                 className="relative"
               >
                 <ShoppingCart className="h-5 w-5" />
-                {itemCount > 0 && (
+                {isHydrated && itemCount > 0 && (
                   <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-xs text-primary-foreground flex items-center justify-center">
                     {itemCount}
                   </span>
