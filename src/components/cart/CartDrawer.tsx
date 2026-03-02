@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
@@ -30,9 +30,9 @@ export const CartDrawer = () => {
         {items.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
             <ShoppingBag className="h-24 w-24 text-muted-foreground/30 mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Tu carrito esta vacio</h3>
+            <h3 className="text-lg font-semibold mb-2">Tu carrito está vacío</h3>
             <p className="text-muted-foreground mb-6">
-              Anade productos para comenzar tu compra
+              Añade productos para comenzar tu compra
             </p>
             <Button onClick={closeCart} asChild>
               <Link href="/productos">Ver productos</Link>
@@ -86,7 +86,7 @@ export const CartDrawer = () => {
               </div>
 
               <p className="text-xs text-center text-muted-foreground pt-1">
-                Los costos de envio se calculan en el checkout
+                Los costos de envío se calculan en el checkout
               </p>
             </div>
           </>
@@ -95,4 +95,5 @@ export const CartDrawer = () => {
     </Sheet>
   );
 };
+
 

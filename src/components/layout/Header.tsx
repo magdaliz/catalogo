@@ -1,8 +1,9 @@
-// src/components/layout/Header.tsx
+﻿// src/components/layout/Header.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ShoppingCart, Search, Heart, Menu, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/cartStore";
@@ -19,6 +20,7 @@ export const Header = () => {
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [logoFailed, setLogoFailed] = useState(false);
   const profileRef = useRef<HTMLDivElement | null>(null);
 
   const userInitial = (user?.displayName?.trim()?.charAt(0) ||
@@ -50,9 +52,9 @@ export const Header = () => {
     try {
       await logout();
       setProfileMenuOpen(false);
-      toast.success("Sesion cerrada");
+      toast.success("Sesión cerrada");
     } catch (error: any) {
-      toast.error("No se pudo cerrar sesion", {
+      toast.error("No se pudo cerrar sesión", {
         description: error?.code || error?.message || "Error desconocido",
       });
     }
@@ -65,9 +67,19 @@ export const Header = () => {
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2">
-              <span className="text-2xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Miyuki
-              </span>
+              {!logoFailed ? (
+                <Image
+                  src="/images/MiyukiTexto.png"
+                  alt="Magdaliz Accesorios"
+                  width={180}
+                  height={52}
+                  className="h-11 w-auto object-contain"
+                  priority
+                  onError={() => setLogoFailed(true)}
+                />
+              ) : (
+                <span className="text-2xl font-bold">Magdaliz</span>
+              )}
             </Link>
 
             {/* Desktop Navigation */}
@@ -192,7 +204,7 @@ export const Header = () => {
                           className="w-full hover:bg-red-600 hover:text-white hover:border-red-600"
                           onClick={handleLogout}
                         >
-                          Cerrar sesion
+                          Cerrar sesión
                         </Button>
                       </div>
                     )}
@@ -224,3 +236,4 @@ export const Header = () => {
     </>
   );
 };
+

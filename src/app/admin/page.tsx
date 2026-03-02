@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -27,10 +27,10 @@ export default function AdminPage() {
       <div className="container mx-auto px-4 py-12 text-center">
         <h1 className="text-2xl font-semibold mb-3">Acceso restringido</h1>
         <p className="text-muted-foreground mb-6">
-          Debes iniciar sesion para acceder al portal admin.
+          Debes iniciar sesión para acceder al portal admin.
         </p>
         <Button asChild>
-          <Link href="/login?redirect=/admin">Iniciar sesion</Link>
+          <Link href="/login?redirect=/admin">Iniciar sesión</Link>
         </Button>
       </div>
     );
@@ -41,7 +41,7 @@ export default function AdminPage() {
       <div className="container mx-auto px-4 py-12 text-center">
         <h1 className="text-2xl font-semibold mb-3">Sin permisos de admin</h1>
         <p className="text-muted-foreground mb-6">
-          Tu cuenta no tiene permisos para esta seccion.
+          Tu cuenta no tiene permisos para esta sección.
         </p>
         <Button variant="outline" asChild>
           <Link href="/">Volver al inicio</Link>
@@ -54,7 +54,7 @@ export default function AdminPage() {
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-3xl font-bold mb-4">Portal admin</h1>
       <p className="text-muted-foreground mb-8">
-        Gestion centralizada de catalogo, colecciones y promociones.
+        Gestión centralizada de catálogo, colecciones y promociones.
       </p>
 
       <div className="flex flex-wrap gap-2 mb-6">
@@ -84,3 +84,4 @@ export default function AdminPage() {
     </div>
   );
 }
+

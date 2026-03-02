@@ -1,6 +1,5 @@
-// src/components/layout/Footer.tsx
-
 import Link from "next/link";
+import Image from "next/image";
 import { Instagram } from "lucide-react";
 import { NewsletterForm } from "@/components/shared/NewsletterForm";
 
@@ -9,11 +8,14 @@ export const Footer = () => {
     <footer className="bg-gray-50 border-t mt-auto">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Logo y descripción */}
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Miyuki
-            </h3>
+            <Image
+              src="/images/MiyukiTexto.png"
+              alt="Magdaliz Accesorios"
+              width={180}
+              height={52}
+              className="h-11 w-auto object-contain"
+            />
             <p className="text-sm text-muted-foreground">
               Los mejores accesorios para complementar tu estilo único.
             </p>
@@ -41,7 +43,6 @@ export const Footer = () => {
             </div>
           </div>
 
-          {/* Productos */}
           <div>
             <h4 className="font-semibold mb-4">Productos</h4>
             <ul className="space-y-2 text-sm">
@@ -80,7 +81,6 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Ayuda */}
           <div>
             <h4 className="font-semibold mb-4">Ayuda</h4>
             <ul className="space-y-2 text-sm">
@@ -119,20 +119,18 @@ export const Footer = () => {
             </ul>
           </div>
 
-          {/* Newsletter */}
           <div>
             <h4 className="font-semibold mb-4">Newsletter</h4>
             <p className="text-sm text-muted-foreground mb-4">
-              Suscríbete para recibir ofertas exclusivas
+              Suscríbete para recibir ofertas exclusivas.
             </p>
             <NewsletterForm />
           </div>
         </div>
 
-        {/* Copyright */}
         <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
           <p>
-            &copy; {new Date().getFullYear()} Accesorios Miyuki. Todos los
+            &copy; {new Date().getFullYear()} Magdaliz Accesorios. Todos los
             derechos reservados.
           </p>
         </div>

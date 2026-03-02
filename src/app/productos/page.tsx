@@ -5,7 +5,7 @@ import { ProductsPageContent } from "@/components/products/ProductsPageContent";
 import { ProductSkeleton } from "@/components/products/ProductSkeleton";
 
 export const metadata = {
-  title: "Productos | Accesorios Miyuki",
+  title: "Productos | Magdaliz Accesorios",
   description:
     "Explora nuestra colección completa de accesorios únicos y encuentra el complemento perfecto para tu estilo",
 };

@@ -11,8 +11,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "Accesorios Miyuki | Tienda Online",
-    template: "%s | Accesorios Miyuki",
+    default: "Magdaliz Accesorios | Tienda Online",
+    template: "%s | Magdaliz Accesorios",
   },
   description: "Descubre la mejor selección de accesorios de moda",
 };
