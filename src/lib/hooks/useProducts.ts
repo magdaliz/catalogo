@@ -32,6 +32,7 @@ export const useProducts = (
     queryFn: async ({ pageParam }) => {
       try {
         let q: Query = collection(db, "productos");
+        const hasSearchFilter = !!filters?.search?.trim();
 
         // Filtro por tipo
         if (filters?.tipo) q = query(q, where("tipo", "==", filters.tipo));
@@ -93,8 +94,10 @@ export const useProducts = (
           appliedFields.add(field);
         });
 
-        if (pageParam) q = query(q, startAfter(pageParam));
-        q = query(q, limit(pageSize));
+        if (!hasSearchFilter) {
+          if (pageParam) q = query(q, startAfter(pageParam));
+          q = query(q, limit(pageSize));
+        }
 
         // Timeout para detectar â€œse quedÃ³ colgadoâ€
         const snap = await Promise.race([
@@ -119,10 +122,28 @@ export const useProducts = (
           } as Product;
         });
 
+        const searchTerm = filters?.search?.trim().toLowerCase() ?? "";
+        const normalizedSearch = searchTerm.replace(/\s+/g, " ");
+
+        const filteredProducts =
+          normalizedSearch.length > 0
+            ? products.filter((product) => {
+                const haystack = [
+                  product.nombre ?? "",
+                  product.tipo ?? "",
+                  product.coleccion ?? "",
+                ]
+                  .join(" ")
+                  .toLowerCase()
+                  .replace(/\s+/g, " ");
+                return haystack.includes(normalizedSearch);
+              })
+            : products;
+
         return {
-          products,
+          products: filteredProducts,
           lastDoc: snap.docs[snap.docs.length - 1] ?? null,
-          hasMore: snap.docs.length === pageSize,
+          hasMore: normalizedSearch ? false : snap.docs.length === pageSize,
         };
       } catch (e: any) {
         console.error("QUERY FAILED:", {
