@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { CartItem, Product } from "@/types/product";
+import { getDiscountedPrice, normalizeDiscount } from "@/lib/utils/formatters";
 
 interface CartStore {
   items: CartItem[];
@@ -109,7 +110,13 @@ export const useCartStore = create<CartStore>()(
       getTotal: () => {
         const { items } = get();
         return items.reduce(
-          (total, item) => total + item.producto.precio * item.cantidad,
+          (total, item) =>
+            total +
+            getDiscountedPrice(
+              item.producto.precio,
+              normalizeDiscount(item.producto.descuento),
+            ) *
+              item.cantidad,
           0,
         );
       },

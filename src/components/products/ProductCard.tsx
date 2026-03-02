@@ -10,7 +10,12 @@ import { Product } from "@/types/product";
 import { useCartStore } from "@/store/cartStore";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { formatPrice } from "@/lib/utils/formatters";
+import {
+  formatPrice,
+  getDiscountedPrice,
+  hasDiscount,
+  normalizeDiscount,
+} from "@/lib/utils/formatters";
 import { useFavorites } from "@/lib/favorites/FavoritesContext";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useRouter } from "next/navigation";
@@ -28,6 +33,9 @@ export const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
   const router = useRouter();
   const inCart = isInCart(product.id);
   const favorite = isFavorite(product.id);
+  const discount = normalizeDiscount(product.descuento);
+  const hasProductDiscount = hasDiscount(discount);
+  const finalPrice = getDiscountedPrice(product.precio, discount);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -81,6 +89,11 @@ export const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
               </Badge>
             )}
             {product.nuevo && <Badge variant="destructive">Nuevo</Badge>}
+            {hasProductDiscount && (
+              <Badge className="bg-red-600 hover:bg-red-700">
+                -{discount}%
+              </Badge>
+            )}
           </div>
 
           {/* Actions */}
@@ -131,10 +144,19 @@ export const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
           </h3>
 
           {/* Precio */}
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-lg">
-              {formatPrice(product.precio)}
-            </span>
+          <div className="flex flex-col">
+            {hasProductDiscount ? (
+              <>
+                <span className="font-bold text-lg text-black">
+                  {formatPrice(finalPrice)}
+                </span>
+                <span className="text-sm text-red-600 line-through">
+                  {formatPrice(product.precio)}
+                </span>
+              </>
+            ) : (
+              <span className="font-bold text-lg">{formatPrice(product.precio)}</span>
+            )}
           </div>
         </div>
       </Link>

@@ -15,7 +15,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/types/product";
 import { useCartStore } from "@/store/cartStore";
-import { formatPrice } from "@/lib/utils/formatters";
+import {
+  formatPrice,
+  getDiscountedPrice,
+  hasDiscount,
+  normalizeDiscount,
+} from "@/lib/utils/formatters";
 import { toast } from "sonner";
 import { useFavorites } from "@/lib/favorites/FavoritesContext";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -35,6 +40,9 @@ export const ProductQuickView = ({
   const { isFavorite, toggleFavorite } = useFavorites();
   const router = useRouter();
   const favorite = isFavorite(product.id);
+  const discount = normalizeDiscount(product.descuento);
+  const hasProductDiscount = hasDiscount(discount);
+  const finalPrice = getDiscountedPrice(product.precio, discount);
 
   const handleAddToCart = () => {
     addItem(product, 1);
@@ -93,6 +101,11 @@ export const ProductQuickView = ({
                   </Badge>
                 )}
                 {product.nuevo && <Badge variant="destructive">Nuevo</Badge>}
+                {hasProductDiscount && (
+                  <Badge className="bg-red-600 hover:bg-red-700">
+                    -{discount}%
+                  </Badge>
+                )}
               </div>
             </div>
           </div>
@@ -109,9 +122,20 @@ export const ProductQuickView = ({
 
             {/* Precio */}
             <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-bold">
-                {formatPrice(product.precio)}
-              </span>
+              {hasProductDiscount ? (
+                <div className="flex flex-col">
+                  <span className="text-3xl font-bold text-black">
+                    {formatPrice(finalPrice)}
+                  </span>
+                  <span className="text-lg text-red-600 line-through">
+                    {formatPrice(product.precio)}
+                  </span>
+                </div>
+              ) : (
+                <span className="text-3xl font-bold">
+                  {formatPrice(product.precio)}
+                </span>
+              )}
             </div>
 
             {/* Colección */}

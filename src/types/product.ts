@@ -5,6 +5,7 @@ export interface Product {
   id: string;
   nombre: string;
   precio: number;
+  descuento?: number;
   tipo: string; // ej: "aretes", "collares", "pulseras"
   coleccion: string; // ej: "Personalizados", "Premium", etc.
   nuevo?: boolean;

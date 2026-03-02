@@ -13,6 +13,36 @@ export const formatPrice = (price: number): string => {
 };
 
 /**
+ * Valida si un producto tiene descuento utilizable
+ */
+export const hasDiscount = (discount?: number): boolean => {
+  return typeof discount === "number" && discount > 0;
+};
+
+/**
+ * Retorna porcentaje de descuento normalizado entre 0 y 100
+ */
+export const normalizeDiscount = (discount?: number): number => {
+  if (typeof discount !== "number" || Number.isNaN(discount)) return 0;
+  if (discount < 0) return 0;
+  if (discount > 100) return 100;
+  return discount;
+};
+
+/**
+ * Calcula el precio final aplicando descuento porcentual
+ */
+export const getDiscountedPrice = (
+  originalPrice: number,
+  discount?: number,
+): number => {
+  const d = normalizeDiscount(discount);
+  if (d <= 0) return originalPrice;
+  const discounted = originalPrice * (1 - d / 100);
+  return Math.round(discounted);
+};
+
+/**
  * Formatea una fecha en formato largo (español)
  */
 export const formatDate = (date: Date): string => {

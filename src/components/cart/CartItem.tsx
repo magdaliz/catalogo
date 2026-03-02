@@ -7,7 +7,12 @@ import { Minus, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CartItem as CartItemType } from "@/types/product";
 import { useCartStore } from "@/store/cartStore";
-import { formatPrice } from "@/lib/utils/formatters";
+import {
+  formatPrice,
+  getDiscountedPrice,
+  hasDiscount,
+  normalizeDiscount,
+} from "@/lib/utils/formatters";
 
 interface CartItemProps {
   item: CartItemType;
@@ -26,7 +31,11 @@ export const CartItem = ({ item }: CartItemProps) => {
     updateQuantity(item.productId, item.cantidad + 1);
   };
 
-  const subtotal = item.producto.precio * item.cantidad;
+  const discount = normalizeDiscount(item.producto.descuento);
+  const hasProductDiscount = hasDiscount(discount);
+  const unitOriginalPrice = item.producto.precio;
+  const unitFinalPrice = getDiscountedPrice(unitOriginalPrice, discount);
+  const subtotal = unitFinalPrice * item.cantidad;
 
   return (
     <div className="flex gap-4 py-4 border-b">
@@ -98,10 +107,20 @@ export const CartItem = ({ item }: CartItemProps) => {
 
           {/* Price */}
           <div className="text-right">
-            <div className="font-semibold text-sm">{formatPrice(subtotal)}</div>
-            {item.cantidad > 1 && (
-              <div className="text-xs text-muted-foreground">
-                {formatPrice(item.producto.precio)} c/u
+            <div className="font-semibold text-sm text-black">
+              {formatPrice(subtotal)}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {formatPrice(unitFinalPrice)} c/u
+            </div>
+            {hasProductDiscount && (
+              <div className="text-xs text-red-600 line-through">
+                {formatPrice(unitOriginalPrice)} c/u
+              </div>
+            )}
+            {hasProductDiscount && (
+              <div className="text-[11px] text-red-600 font-medium">
+                -{discount}%
               </div>
             )}
           </div>

@@ -1,13 +1,12 @@
 import { CartItem } from "@/types/product";
+import {
+  formatPrice,
+  getDiscountedPrice,
+  hasDiscount,
+  normalizeDiscount,
+} from "@/lib/utils/formatters";
 
 const WHATSAPP_PHONE_E164 = "573185289607";
-
-const formatCOP = (value: number) =>
-  new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(value);
 
 export function buildWhatsAppCartMessage(items: CartItem[]) {
   const lines: string[] = [];
@@ -22,8 +21,11 @@ export function buildWhatsAppCartMessage(items: CartItem[]) {
   let total = 0;
 
   items.forEach((item, index) => {
+    const discount = normalizeDiscount(item.producto.descuento);
+    const hasProductDiscount = hasDiscount(discount);
     const unitPrice = item.producto.precio;
-    const subtotal = unitPrice * item.cantidad;
+    const finalUnitPrice = getDiscountedPrice(unitPrice, discount);
+    const subtotal = finalUnitPrice * item.cantidad;
     total += subtotal;
 
     const variantes: string[] = [];
@@ -35,13 +37,18 @@ export function buildWhatsAppCartMessage(items: CartItem[]) {
     lines.push(
       `${index + 1}. ${item.producto.nombre}${variantesTexto}`,
     );
-    lines.push(
-      `   Cantidad: ${item.cantidad} | Unitario: ${formatCOP(unitPrice)} | Subtotal: ${formatCOP(subtotal)}`,
-    );
+    if (hasProductDiscount) {
+      lines.push(
+        `   Dcto: ${discount}% | Antes: ${formatPrice(unitPrice)} | Ahora: ${formatPrice(finalUnitPrice)}`,
+      );
+    } else {
+      lines.push(`   Precio unitario: ${formatPrice(finalUnitPrice)}`);
+    }
+    lines.push(`   Cantidad: ${item.cantidad} | Subtotal: ${formatPrice(subtotal)}`);
   });
 
   lines.push("");
-  lines.push(`Total: ${formatCOP(total)}`);
+  lines.push(`Total: ${formatPrice(total)}`);
   lines.push("");
   lines.push("Quedo atento(a) a confirmacion de disponibilidad y costos de envio. Gracias.");
 
@@ -52,4 +59,3 @@ export function getWhatsAppCartURL(items: CartItem[]) {
   const text = buildWhatsAppCartMessage(items);
   return `https://wa.me/${WHATSAPP_PHONE_E164}?text=${encodeURIComponent(text)}`;
 }
-

@@ -113,6 +113,7 @@ export const useProducts = (
             id: docSnap.id,
             nombre: d.nombre,
             precio: d.precio,
+            descuento: d.descuento,
             tipo: d.tipo,
             coleccion: d.coleccion,
             nuevo: d.nuevo,
@@ -183,6 +184,7 @@ export const useProduct = (productId: string) => {
         id: docSnap.id,
         nombre: data.nombre,
         precio: data.precio,
+        descuento: data.descuento,
         tipo: data.tipo,
         coleccion: data.coleccion,
         imagen: data.imagen,
@@ -214,6 +216,7 @@ export const useProductsByTipo = (tipo: string, limitCount: number = 8) => {
           id: docSnap.id,
           nombre: data.nombre,
           precio: data.precio,
+          descuento: data.descuento,
           tipo: data.tipo,
           coleccion: data.coleccion,
           imagen: data.imagen,
@@ -249,6 +252,7 @@ export const useProductsByColeccion = (
           id: docSnap.id,
           nombre: data.nombre,
           precio: data.precio,
+          descuento: data.descuento,
           tipo: data.tipo,
           coleccion: data.coleccion,
           imagen: data.imagen,
@@ -288,6 +292,7 @@ export const useRelatedProducts = (
             id: docSnap.id,
             nombre: data.nombre,
             precio: data.precio,
+            descuento: data.descuento,
             tipo: data.tipo,
             coleccion: data.coleccion,
             imagen: data.imagen,
@@ -317,6 +322,7 @@ export const useSearchProducts = (searchQuery: string) => {
             id: docSnap.id,
             nombre: data.nombre,
             precio: data.precio,
+            descuento: data.descuento,
             tipo: data.tipo,
             coleccion: data.coleccion,
             imagen: data.imagen,
@@ -332,6 +338,41 @@ export const useSearchProducts = (searchQuery: string) => {
     },
     enabled: searchQuery.length > 0,
     staleTime: 1000 * 60 * 2,
+  });
+};
+
+// ==========================================
+// Obtener productos en oferta (descuento > 0)
+// ==========================================
+export const useProductsOnOffer = (limitCount: number = 60) => {
+  return useQuery({
+    queryKey: ["products-on-offer", limitCount],
+    queryFn: async () => {
+      const q = query(
+        collection(db, "productos"),
+        where("descuento", ">", 0),
+        orderBy("descuento", "desc"),
+        limit(limitCount),
+      );
+
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map((docSnap) => {
+        const data = docSnap.data();
+        return {
+          id: docSnap.id,
+          nombre: data.nombre,
+          precio: data.precio,
+          descuento: data.descuento,
+          tipo: data.tipo,
+          coleccion: data.coleccion,
+          nuevo: data.nuevo,
+          createdAt: data.createdAt?.toDate?.() ?? data.createdAt,
+          imagen: data.imagen,
+          imagenAlt: data.imagenAlt,
+        } as Product;
+      });
+    },
+    staleTime: 1000 * 60 * 5,
   });
 };
 
