@@ -1,4 +1,4 @@
-// src/lib/hooks/useProducts.ts
+﻿// src/lib/hooks/useProducts.ts
 
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import {
@@ -18,7 +18,7 @@ import { db } from "@/lib/firebase/config";
 import { Product, ProductFilters, SortOption } from "@/types/product";
 
 // ==========================================
-// Hook principal con PAGINACIÓN INFINITA
+// Hook principal con PAGINACIÃ“N INFINITA
 // ==========================================
 export const useProducts = (
   filters?: ProductFilters,
@@ -36,7 +36,7 @@ export const useProducts = (
         // Filtro por tipo
         if (filters?.tipo) q = query(q, where("tipo", "==", filters.tipo));
 
-        // Filtro por colección
+        // Filtro por colecciÃ³n
         if (filters?.coleccion)
           q = query(q, where("coleccion", "==", filters.coleccion));
         if (filters?.nuevo) q = query(q, where("nuevo", "==", true));
@@ -52,18 +52,51 @@ export const useProducts = (
         if (hasMaxPrice)
           q = query(q, where("precio", "<=", filters!.maxPrecio!));
 
-        // Ordenamiento
-        if (hasPriceFilter) {
+        // Ordenamiento segun opcion seleccionada
+        const sortClauses: Array<{
+          field: "createdAt" | "precio" | "nombre";
+          direction: "asc" | "desc";
+        }> = (() => {
+          switch (sortBy) {
+            case "price-asc":
+              return [
+                { field: "precio", direction: "asc" },
+                { field: "nombre", direction: "asc" },
+              ];
+            case "price-desc":
+              return [
+                { field: "precio", direction: "desc" },
+                { field: "nombre", direction: "asc" },
+              ];
+            case "name-asc":
+              return [{ field: "nombre", direction: "asc" }];
+            case "name-desc":
+              return [{ field: "nombre", direction: "desc" }];
+            case "newest":
+            default:
+              return [
+                { field: "createdAt", direction: "desc" },
+                { field: "nombre", direction: "asc" },
+              ];
+          }
+        })();
+
+        const appliedFields = new Set<string>();
+        if (hasPriceFilter && sortClauses[0]?.field !== "precio") {
           q = query(q, orderBy("precio", "asc"));
-          q = query(q, orderBy("nombre", "asc")); // (esto puede pedir índice, pero si falla lo veremos)
-        } else {
-          q = query(q, orderBy("nombre", "asc"));
+          appliedFields.add("precio");
         }
+
+        sortClauses.forEach(({ field, direction }) => {
+          if (appliedFields.has(field)) return;
+          q = query(q, orderBy(field, direction));
+          appliedFields.add(field);
+        });
 
         if (pageParam) q = query(q, startAfter(pageParam));
         q = query(q, limit(pageSize));
 
-        // Timeout para detectar “se quedó colgado”
+        // Timeout para detectar â€œse quedÃ³ colgadoâ€
         const snap = await Promise.race([
           getDocs(q),
           new Promise<never>((_, reject) =>
@@ -117,7 +150,7 @@ export const useProduct = (productId: string) => {
   return useQuery({
     queryKey: ["product", productId],
     queryFn: async () => {
-      const docRef = doc(db, "productos", productId); // ← CORREGIDO
+      const docRef = doc(db, "productos", productId); // â† CORREGIDO
       const docSnap = await getDoc(docRef);
 
       if (!docSnap.exists()) {
@@ -140,14 +173,14 @@ export const useProduct = (productId: string) => {
 };
 
 // ==========================================
-// Obtener productos por tipo (categoría)
+// Obtener productos por tipo (categorÃ­a)
 // ==========================================
 export const useProductsByTipo = (tipo: string, limitCount: number = 8) => {
   return useQuery({
     queryKey: ["products-by-tipo", tipo, limitCount],
     queryFn: async () => {
       const q = query(
-        collection(db, "productos"), // ← CORREGIDO
+        collection(db, "productos"), // â† CORREGIDO
         where("tipo", "==", tipo),
         orderBy("nombre", "asc"),
         limit(limitCount),
@@ -172,7 +205,7 @@ export const useProductsByTipo = (tipo: string, limitCount: number = 8) => {
 };
 
 // ==========================================
-// Obtener productos por colección
+// Obtener productos por colecciÃ³n
 // ==========================================
 export const useProductsByColeccion = (
   coleccion: string,
@@ -182,7 +215,7 @@ export const useProductsByColeccion = (
     queryKey: ["products-by-coleccion", coleccion, limitCount],
     queryFn: async () => {
       const q = query(
-        collection(db, "productos"), // ← CORREGIDO
+        collection(db, "productos"), // â† CORREGIDO
         where("coleccion", "==", coleccion),
         orderBy("nombre", "asc"),
         limit(limitCount),
@@ -218,7 +251,7 @@ export const useRelatedProducts = (
     queryKey: ["related-products", tipo, currentProductId],
     queryFn: async () => {
       const q = query(
-        collection(db, "productos"), // ← CORREGIDO
+        collection(db, "productos"), // â† CORREGIDO
         where("tipo", "==", tipo),
         orderBy("nombre", "asc"),
         limit(limitCount + 1),
@@ -252,7 +285,7 @@ export const useSearchProducts = (searchQuery: string) => {
   return useQuery({
     queryKey: ["search-products", searchQuery],
     queryFn: async () => {
-      const q = query(collection(db, "productos")); // ← CORREGIDO
+      const q = query(collection(db, "productos")); // â† CORREGIDO
       const snapshot = await getDocs(q);
 
       const searchLower = searchQuery.toLowerCase();
@@ -282,34 +315,34 @@ export const useSearchProducts = (searchQuery: string) => {
 };
 
 // ==========================================
-// Obtener todos los tipos únicos (SIN DUPLICADOS)
+// Obtener todos los tipos Ãºnicos (SIN DUPLICADOS)
 // ==========================================
 export const useProductTypes = () => {
   return useQuery({
     queryKey: ["product-types"],
     queryFn: async () => {
-      const snapshot = await getDocs(collection(db, "productos")); // ← CORREGIDO
+      const snapshot = await getDocs(collection(db, "productos")); // â† CORREGIDO
       const types = new Set<string>();
 
       snapshot.docs.forEach((docSnap) => {
         const tipo = docSnap.data().tipo;
-        if (tipo) types.add(tipo); // Set elimina duplicados automáticamente
+        if (tipo) types.add(tipo); // Set elimina duplicados automÃ¡ticamente
       });
 
-      return Array.from(types).sort(); // Ordenar alfabéticamente
+      return Array.from(types).sort(); // Ordenar alfabÃ©ticamente
     },
     staleTime: 1000 * 60 * 10,
   });
 };
 
 // ==========================================
-// Obtener todas las colecciones únicas
+// Obtener todas las colecciones Ãºnicas
 // ==========================================
 export const useColecciones = () => {
   return useQuery({
     queryKey: ["colecciones"],
     queryFn: async () => {
-      const snapshot = await getDocs(collection(db, "productos")); // ← CORREGIDO
+      const snapshot = await getDocs(collection(db, "productos")); // â† CORREGIDO
       const colecciones = new Set<string>();
 
       snapshot.docs.forEach((docSnap) => {
@@ -322,3 +355,4 @@ export const useColecciones = () => {
     staleTime: 1000 * 60 * 10,
   });
 };
+
