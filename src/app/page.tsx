@@ -8,34 +8,50 @@ import { ProductSkeleton } from "@/components/products/ProductSkeleton";
 export default function HomePage() {
   return (
     <div className="flex flex-col">
-      <section className="relative h-[70vh] min-h-125 flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-br from-purple-600 via-pink-500 to-orange-400" />
-        <div className="absolute inset-0 bg-black/20" />
+      <section className="relative -mt-16 min-h-screen pt-16 flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-br from-violet-300 via-fuchsia-300 to-indigo-200" />
+        <div className="absolute inset-0 bg-linear-to-br from-purple-500/8 via-transparent to-white/25" />
 
-        <div className="relative z-10 container mx-auto px-4 text-center text-white">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
-            Hecho a mano. Hecho para destacar.
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto opacity-90">
-            Accesorios únicos que cuentan tu historia.
-          </p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Button size="lg" className="text-lg" asChild>
-              <Link href="/productos">
-                Ver colección
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="text-lg bg-white/10 backdrop-blur-sm border-white text-white hover:bg-white/20"
-              asChild
-            >
-              <Link href="/colecciones">Colecciones</Link>
-            </Button>
+        <div className="relative z-10 container mx-auto px-4 py-20 text-center">
+          <div className="space-y-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/35 border border-white/60 backdrop-blur-sm">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fuchsia-600 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-fuchsia-600" />
+              </span>
+              <span className="text-sm font-medium text-slate-800">
+                Accesorios hechos a mano en Colombia
+              </span>
+            </div>
+
+            <h1 className="text-5xl md:text-7xl font-bold text-slate-900 leading-tight">
+              Hecho a mano. Hecho para destacar.
+            </h1>
+
+            <p className="text-xl md:text-2xl text-slate-700 max-w-3xl mx-auto leading-relaxed">
+              Accesorios unicos que cuentan tu historia.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
+              <Button size="lg" className="text-lg" asChild>
+                <Link href="/productos">
+                  Ver coleccion
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-lg bg-white/55 backdrop-blur-sm border-white/80 text-slate-900 hover:bg-white/75"
+                asChild
+              >
+                <Link href="/colecciones">Colecciones</Link>
+              </Button>
+            </div>
           </div>
         </div>
+
+        <div className="absolute bottom-0 left-0 right-0 h-40 md:h-56 bg-linear-to-t from-white to-transparent" />
       </section>
 
       <section className="py-16 bg-gray-50">
@@ -47,7 +63,7 @@ export default function HomePage() {
               </div>
               <h3 className="text-xl font-bold mb-2">Hecho a mano</h3>
               <p className="text-muted-foreground">
-                Cada pieza se elabora artesanalmente con detalle y dedicación.
+                Cada pieza se elabora artesanalmente con detalle y dedicacion.
               </p>
             </div>
 
@@ -57,7 +73,7 @@ export default function HomePage() {
               </div>
               <h3 className="text-xl font-bold mb-2">100% colombiano</h3>
               <p className="text-muted-foreground">
-                Diseño local que impulsa talento colombiano y producción
+                Diseno local que impulsa talento colombiano y produccion
                 nacional.
               </p>
             </div>
@@ -68,7 +84,7 @@ export default function HomePage() {
               </div>
               <h3 className="text-xl font-bold mb-2">Personalizados para ti</h3>
               <p className="text-muted-foreground">
-                Creamos accesorios únicos según tu estilo, ocasión o idea.
+                Creamos accesorios unicos segun tu estilo, ocasion o idea.
               </p>
             </div>
           </div>
@@ -79,10 +95,10 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Nuestra colección
+              Nuestra coleccion
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Explora nuestros accesorios únicos y encuentra el complemento
+              Explora nuestros accesorios unicos y encuentra el complemento
               perfecto para tu estilo.
             </p>
           </div>
@@ -106,7 +122,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Explora por categoría
+              Explora por categoria
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Encuentra exactamente lo que buscas.
@@ -118,7 +134,7 @@ export default function HomePage() {
               href="/productos?tipo=aretes"
               className="group relative h-64 rounded-lg overflow-hidden"
             >
-              <div className="absolute inset-0 bg-linear-to-br from-purple-400 to-pink-400" />
+              <div className="absolute inset-0 bg-linear-to-br from-violet-400 via-fuchsia-300 to-pink-300" />
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <h3 className="text-white text-2xl font-bold">Aretes</h3>
@@ -129,10 +145,10 @@ export default function HomePage() {
               href="/productos?tipo=Mu%C3%B1eco"
               className="group relative h-64 rounded-lg overflow-hidden"
             >
-              <div className="absolute inset-0 bg-linear-to-br from-pink-400 to-orange-400" />
+              <div className="absolute inset-0 bg-linear-to-br from-fuchsia-400 via-purple-300 to-indigo-300" />
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <h3 className="text-white text-2xl font-bold">Muñecos</h3>
+                <h3 className="text-white text-2xl font-bold">Munecos</h3>
               </div>
             </Link>
 
@@ -140,7 +156,7 @@ export default function HomePage() {
               href="/productos?tipo=pulsera"
               className="group relative h-64 rounded-lg overflow-hidden"
             >
-              <div className="absolute inset-0 bg-linear-to-br from-orange-400 to-yellow-400" />
+              <div className="absolute inset-0 bg-linear-to-br from-indigo-400 via-violet-300 to-fuchsia-300" />
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <h3 className="text-white text-2xl font-bold">Pulseras</h3>
@@ -150,25 +166,33 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-20 bg-linear-to-r from-purple-600 to-pink-600">
-        <div className="container mx-auto px-4 text-center text-white">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            ¿Listo para renovar tu estilo?
-          </h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Sé parte de quienes ya eligieron calidad y diseño único. Descubre
-            por qué nuestras piezas marcan la diferencia.
-          </p>
-          <Button
-            size="lg"
-            className="bg-white text-purple-600 hover:bg-gray-100"
-            asChild
-          >
-            <Link href="/productos">
-              Comenzar a comprar
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
+      <section className="relative py-24 bg-white overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="relative rounded-3xl border border-white/60 bg-linear-to-r from-violet-300/85 via-fuchsia-300/85 to-indigo-200/85 px-6 py-14 md:px-12 md:py-16 shadow-2xl backdrop-blur-sm overflow-hidden">
+            <div className="pointer-events-none absolute -top-24 -left-16 h-56 w-56 rounded-full bg-white/25 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-24 -right-16 h-56 w-56 rounded-full bg-indigo-300/35 blur-3xl" />
+
+            <div className="relative z-10 text-center">
+              <h2 className="text-3xl md:text-5xl font-bold mb-6 text-slate-900">
+                Listo para renovar tu estilo?
+              </h2>
+              <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto text-slate-700">
+                Se parte de quienes ya eligieron calidad y diseno unico.
+                Descubre por que nuestras piezas marcan la diferencia.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Button size="lg" className="text-lg" asChild>
+                  <Link href="/productos">
+                    Comenzar a comprar
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" className="text-lg bg-white/60 hover:bg-white/80 border-white/80 text-slate-900" asChild>
+                  <Link href="/colecciones">Ver colecciones</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>

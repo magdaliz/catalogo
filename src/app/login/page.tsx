@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
@@ -31,7 +31,7 @@ function GoogleLogo() {
   );
 }
 
-export default function LoginPage() {
+function LoginPageContent() {
   const { user, loading, signInWithGoogle } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -100,5 +100,21 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-b from-fuchsia-50 to-white flex items-center justify-center px-4 py-10">
+          <div className="w-full max-w-md rounded-2xl border bg-card p-7 sm:p-8 shadow-lg">
+            <p className="text-sm text-muted-foreground">Cargando...</p>
+          </div>
+        </div>
+      }
+    >
+      <LoginPageContent />
+    </Suspense>
   );
 }

@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   ShoppingCart,
   Heart,
@@ -34,6 +34,7 @@ export const Header = () => {
   const { toggleCart, closeCart, getItemCount } = useCartStore();
   const { user, isAdmin, logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const itemCount = getItemCount();
   const favoritesHref = user ? "/favoritos" : "/login?redirect=/favoritos";
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -42,7 +43,10 @@ export const Header = () => {
   const [logoFailed, setLogoFailed] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const profileRef = useRef<HTMLDivElement | null>(null);
+  const isHome = pathname === "/";
+  const isHomeTop = isHome && !isScrolled;
 
   const userInitial = (user?.displayName?.trim()?.charAt(0) ||
     user?.email?.trim()?.charAt(0) ||
@@ -69,6 +73,13 @@ export const Header = () => {
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
 
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 10);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
@@ -90,13 +101,21 @@ export const Header = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <header
+        className={`sticky top-0 z-50 w-full transition-colors duration-300 ${
+          isHomeTop
+            ? "border-transparent bg-transparent"
+            : isHome
+              ? "border-b border-border/60 bg-background/35 backdrop-blur supports-backdrop-filter:bg-background/35"
+              : "border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60"
+        }`}
+      >
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <Link
               href="/"
-              className={`flex items-center space-x-2 transition-all duration-300 ease-out ${
+              className={`flex items-center space-x-2 transition-all duration-300 ease-out md:mr-6 lg:mr-10 ${
                 mobileMenuOpen
                   ? "opacity-0 -translate-y-1 pointer-events-none md:opacity-100 md:translate-y-0 md:pointer-events-auto"
                   : "opacity-100 translate-y-0"
