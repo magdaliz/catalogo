@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import {
   useCallback,
@@ -99,7 +99,6 @@ export const ProductFilters = ({
     (clientX: number) => {
       const track = trackRef.current;
       if (!track) return PRICE_MIN;
-
       const rect = track.getBoundingClientRect();
       const ratio = (clientX - rect.left) / rect.width;
       const raw = PRICE_MIN + (PRICE_MAX - PRICE_MIN) * ratio;
@@ -157,7 +156,6 @@ export const ProductFilters = ({
     const distanceToMax = Math.abs(clickedValue - priceRange[1]);
     const target: "min" | "max" =
       distanceToMin <= distanceToMax ? "min" : "max";
-
     setDragTarget(target);
     updateDragValue(event.clientX, target);
   };
@@ -244,7 +242,6 @@ export const ProductFilters = ({
               className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 h-4 w-4 rounded-full border border-primary bg-white shadow-sm cursor-grab active:cursor-grabbing"
               style={{ left: `${minPercent}%` }}
             />
-
             <button
               type="button"
               aria-label="Precio máximo"
@@ -293,7 +290,10 @@ export const ProductFilters = ({
             Filtros
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-[88%] max-w-sm overflow-y-auto px-4 pb-6">
+        <SheetContent
+          side="left"
+          className="w-[88%] max-w-sm overflow-y-auto px-4 pb-6"
+        >
           <SheetHeader>
             <SheetTitle>Filtros</SheetTitle>
           </SheetHeader>

@@ -10,7 +10,9 @@
     "firebase:set-nuevo-all": "node scripts/set-nuevo-all.js",
     "firebase:set-createdat-nuevo": "node scripts/set-createdat-nuevo-this-year.js",
     "firebase:set-descuentos": "node scripts/set-descuentos.js",
-    "firebase:set-admin": "node scripts/set-admin-user.js"
+    "firebase:set-admin": "node scripts/set-admin-user.js",
+    "firebase:sync-colecciones": "node scripts/sync-colecciones-from-productos.js",
+    "firebase:clear-general-collection": "node scripts/clear-general-collection.js"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.21",

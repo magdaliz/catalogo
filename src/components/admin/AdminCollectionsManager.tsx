@@ -95,18 +95,18 @@ export function AdminCollectionsManager() {
       setSaving(true);
       if (form.id) {
         await updateDoc(doc(db, "colecciones", form.id), payload);
-        toast.success("Coleccion actualizada");
+        toast.success("Colección actualizada");
       } else {
         await addDoc(collection(db, "colecciones"), {
           ...payload,
           createdAt: serverTimestamp(),
         });
-        toast.success("Coleccion creada");
+        toast.success("Colección creada");
       }
       resetForm();
     } catch (error: any) {
       console.error(error);
-      toast.error("No se pudo guardar coleccion", {
+      toast.error("No se pudo guardar colección", {
         description: error?.code || error?.message || "Error desconocido",
       });
     } finally {
@@ -124,12 +124,14 @@ export function AdminCollectionsManager() {
   };
 
   const onDelete = async (item: CollectionDoc) => {
-    const confirmDelete = window.confirm(`Eliminar coleccion "${item.nombre}"?`);
+    const confirmDelete = window.confirm(
+      `Eliminar colección "${item.nombre}"?`,
+    );
     if (!confirmDelete) return;
 
     try {
       await deleteDoc(doc(db, "colecciones", item.id));
-      toast.success("Coleccion eliminada");
+      toast.success("Colección eliminada");
       if (form.id === item.id) resetForm();
     } catch (error: any) {
       toast.error("No se pudo eliminar", {
@@ -142,28 +144,41 @@ export function AdminCollectionsManager() {
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
       <div className="xl:col-span-1 rounded-xl border bg-card p-5">
         <h2 className="text-xl font-semibold mb-4">
-          {isEditing ? "Editar coleccion" : "Nueva coleccion"}
+          {isEditing ? "Editar colección" : "Nueva colección"}
         </h2>
         <form className="space-y-3" onSubmit={handleSubmit}>
-          <Input
-            placeholder="Nombre"
-            value={form.nombre}
-            onChange={(e) => setForm((s) => ({ ...s, nombre: e.target.value }))}
-          />
-          <Input
-            placeholder="Descripcion"
-            value={form.descripcion}
-            onChange={(e) =>
-              setForm((s) => ({ ...s, descripcion: e.target.value }))
-            }
-          />
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">
+              Nombre de la colección
+            </label>
+            <Input
+              placeholder="Ej: Amor y Amistad"
+              value={form.nombre}
+              onChange={(e) =>
+                setForm((s) => ({ ...s, nombre: e.target.value }))
+              }
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">Descripción</label>
+            <textarea
+              className="min-h-28 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              placeholder="Describe la colección como un parrafo corto"
+              value={form.descripcion}
+              onChange={(e) =>
+                setForm((s) => ({ ...s, descripcion: e.target.value }))
+              }
+            />
+          </div>
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               checked={form.activa}
-              onChange={(e) => setForm((s) => ({ ...s, activa: e.target.checked }))}
+              onChange={(e) =>
+                setForm((s) => ({ ...s, activa: e.target.checked }))
+              }
             />
-            Coleccion activa
+            Colección activa
           </label>
           <div className="flex gap-2 pt-2">
             <Button type="submit" className="flex-1" disabled={saving}>
@@ -183,7 +198,9 @@ export function AdminCollectionsManager() {
         {loading ? (
           <p className="text-muted-foreground">Cargando colecciones...</p>
         ) : collections.length === 0 ? (
-          <p className="text-muted-foreground">No hay colecciones registradas.</p>
+          <p className="text-muted-foreground">
+            No hay colecciones registradas.
+          </p>
         ) : (
           <div className="space-y-2 max-h-[560px] overflow-auto pr-1">
             {collections.map((item) => (
@@ -198,7 +215,11 @@ export function AdminCollectionsManager() {
                   </p>
                 </div>
                 <div className="flex gap-2 shrink-0">
-                  <Button variant="outline" size="sm" onClick={() => onEdit(item)}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onEdit(item)}
+                  >
                     Editar
                   </Button>
                   <Button
@@ -218,4 +239,3 @@ export function AdminCollectionsManager() {
     </div>
   );
 }
-

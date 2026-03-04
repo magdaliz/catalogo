@@ -404,22 +404,27 @@ export const useColecciones = () => {
   return useQuery({
     queryKey: ["colecciones"],
     queryFn: async () => {
-      const adminCollectionsSnapshot = await getDocs(collection(db, "colecciones"));
-      const adminCollections = adminCollectionsSnapshot.docs
-        .map((docSnap) => docSnap.data())
-        .filter((d) => d?.activa !== false && typeof d?.nombre === "string")
-        .map((d) => String(d.nombre).trim())
-        .filter(Boolean);
+      try {
+        const adminCollectionsSnapshot = await getDocs(collection(db, "colecciones"));
+        const adminCollections = adminCollectionsSnapshot.docs
+          .map((docSnap) => docSnap.data())
+          .filter((d) => d?.activa !== false && typeof d?.nombre === "string")
+          .map((d) => String(d.nombre).trim())
+          .filter(Boolean);
 
-      if (adminCollections.length > 0) {
-        return Array.from(new Set(adminCollections)).sort();
+        if (adminCollections.length > 0) {
+          return Array.from(new Set(adminCollections)).sort();
+        }
+      } catch {
+        // Sin permiso de lectura sobre "colecciones":
+        // hacemos fallback usando los campos de "productos".
       }
 
       const snapshot = await getDocs(collection(db, "productos"));
       const colecciones = new Set<string>();
 
       snapshot.docs.forEach((docSnap) => {
-        const coleccion = docSnap.data().coleccion;
+        const coleccion = String(docSnap.data().coleccion ?? "").trim();
         if (coleccion) colecciones.add(coleccion);
       });
 

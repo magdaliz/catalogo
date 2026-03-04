@@ -13,6 +13,7 @@ import {
   ShoppingBag,
   Sparkles,
   BadgePercent,
+  LayoutGrid,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/cartStore";
@@ -123,6 +124,12 @@ export const Header = () => {
                 className="hover:text-primary transition-colors"
               >
                 Productos
+              </Link>
+              <Link
+                href="/colecciones"
+                className="hover:text-primary transition-colors"
+              >
+                Colecciones
               </Link>
               <Link
                 href="/productos?nuevo=1"
@@ -290,6 +297,14 @@ export const Header = () => {
                           <Link href="/productos">
                             <ShoppingBag className="h-4 w-4 mr-2" />
                             Productos
+                          </Link>
+                        </Button>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Button variant="outline" className="justify-start" asChild>
+                          <Link href="/colecciones">
+                            <LayoutGrid className="h-4 w-4 mr-2" />
+                            Colecciones
                           </Link>
                         </Button>
                       </SheetClose>

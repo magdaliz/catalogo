@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -6,8 +6,8 @@ import { X, Grid3x3, List } from "lucide-react";
 import { ProductGrid } from "./ProductGrid";
 import { ProductFilters } from "./ProductFilters";
 import { ProductSkeleton } from "./ProductSkeleton";
-import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/shared/SearchBar";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,

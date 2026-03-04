@@ -142,7 +142,7 @@ export function AdminProductsManager() {
       precio,
       descuento,
       tipo: form.tipo.trim() || "general",
-      coleccion: form.coleccion.trim() || "General",
+      coleccion: form.coleccion.trim(),
       imagen: form.imagen.trim() || "/images/placeholder.jpg",
       imagenAlt: form.nombre.trim(),
       nuevo: !!form.nuevo,
