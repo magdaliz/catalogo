@@ -22,6 +22,29 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+function clearClientAuthArtifacts() {
+  if (typeof window === "undefined") return;
+
+  const shouldRemoveKey = (key: string) =>
+    key.startsWith("firebase:") &&
+    (key.includes(":authUser:") ||
+      key.includes(":redirectUser:") ||
+      key.includes(":pendingRedirect:") ||
+      key.includes(":popupRedirectUser:"));
+
+  const clearFrom = (storage: Storage) => {
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < storage.length; i += 1) {
+      const key = storage.key(i);
+      if (key && shouldRemoveKey(key)) keysToRemove.push(key);
+    }
+    keysToRemove.forEach((key) => storage.removeItem(key));
+  };
+
+  clearFrom(window.localStorage);
+  clearFrom(window.sessionStorage);
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -50,6 +73,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     await signOut(auth);
+    clearClientAuthArtifacts();
+    setUser(null);
+    setIsAdmin(false);
   };
 
   const refreshClaims = async () => {

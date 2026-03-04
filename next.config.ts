@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Optimización de imágenes
+  // Permite solicitudes al dev server desde esta IP local
+  allowedDevOrigins: ["192.168.78.151"],
+
+  // Optimizacion de imagenes
   images: {
     remotePatterns: [
       {
@@ -18,17 +21,14 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 
-  // Experimental features
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },
 
-  // Configuración de compilación
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
 
-  // Headers de seguridad
   async headers() {
     return [
       {
