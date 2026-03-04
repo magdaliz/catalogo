@@ -70,14 +70,6 @@ export const Footer = () => {
                   Ofertas
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/productos/categoria/destacados"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Destacados
-                </Link>
-              </li>
             </ul>
           </div>
 

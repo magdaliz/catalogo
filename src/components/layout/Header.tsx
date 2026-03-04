@@ -4,23 +4,43 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingCart, Search, Heart, Menu, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  ShoppingCart,
+  Heart,
+  Menu,
+  User,
+  ShoppingBag,
+  Sparkles,
+  BadgePercent,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/cartStore";
 import { SearchBar } from "@/components/shared/SearchBar";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { toast } from "sonner";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export const Header = () => {
-  const { items, toggleCart, getItemCount } = useCartStore();
+  const { toggleCart, closeCart, getItemCount } = useCartStore();
   const { user, isAdmin, logout } = useAuth();
+  const router = useRouter();
   const itemCount = getItemCount();
   const favoritesHref = user ? "/favoritos" : "/login?redirect=/favoritos";
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
   const [logoFailed, setLogoFailed] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement | null>(null);
 
   const userInitial = (user?.displayName?.trim()?.charAt(0) ||
@@ -50,13 +70,20 @@ export const Header = () => {
 
   const handleLogout = async () => {
     try {
+      setIsLoggingOut(true);
       await logout();
       setProfileMenuOpen(false);
+      setMobileMenuOpen(false);
+      closeCart();
       toast.success("Sesión cerrada");
+      router.replace("/");
+      router.refresh();
     } catch (error: any) {
       toast.error("No se pudo cerrar sesión", {
         description: error?.code || error?.message || "Error desconocido",
       });
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -66,7 +93,14 @@ export const Header = () => {
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2">
+            <Link
+              href="/"
+              className={`flex items-center space-x-2 transition-all duration-300 ease-out ${
+                mobileMenuOpen
+                  ? "opacity-0 -translate-y-1 pointer-events-none md:opacity-100 md:translate-y-0 md:pointer-events-auto"
+                  : "opacity-100 translate-y-0"
+              }`}
+            >
               {!logoFailed ? (
                 <Image
                   src="/images/MiyukiTexto.png"
@@ -111,13 +145,8 @@ export const Header = () => {
 
             {/* Actions */}
             <div className="flex items-center gap-2">
-              {/* Search - Mobile */}
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Search className="h-5 w-5" />
-              </Button>
-
               {/* Wishlist */}
-              <Button variant="ghost" size="icon" asChild>
+              <Button variant="ghost" size="icon" asChild className="hidden md:inline-flex">
                 <Link href={favoritesHref}>
                   <Heart className="h-5 w-5" />
                 </Link>
@@ -128,7 +157,7 @@ export const Header = () => {
                 variant="ghost"
                 size="icon"
                 onClick={toggleCart}
-                className="relative"
+                className="relative hidden md:inline-flex"
               >
                 <ShoppingCart className="h-5 w-5" />
                 {isHydrated && itemCount > 0 && (
@@ -203,8 +232,9 @@ export const Header = () => {
                           variant="outline"
                           className="w-full hover:bg-red-600 hover:text-white hover:border-red-600"
                           onClick={handleLogout}
+                          disabled={isLoggingOut}
                         >
-                          Cerrar sesión
+                          {isLoggingOut ? "Cerrando..." : "Cerrar sesión"}
                         </Button>
                       </div>
                     )}
@@ -224,9 +254,114 @@ export const Header = () => {
               </div>
 
               {/* Mobile menu */}
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
-              </Button>
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={`md:hidden transition-all duration-200 ${
+                      mobileMenuOpen
+                        ? "opacity-0 pointer-events-none scale-95"
+                        : "opacity-100 scale-100"
+                    }`}
+                  >
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[88%] max-w-sm">
+                  <SheetHeader>
+                    <SheetTitle>
+                      <Image
+                        src="/images/MiyukiTexto.png"
+                        alt="Magdaliz Accesorios"
+                        width={160}
+                        height={44}
+                        className="h-9 w-auto object-contain"
+                      />
+                    </SheetTitle>
+                  </SheetHeader>
+
+                  <div className="mt-6 space-y-5 px-4 pb-4">
+                    <SearchBar />
+
+                    <nav className="grid gap-2">
+                      <SheetClose asChild>
+                        <Button variant="outline" className="justify-start" asChild>
+                          <Link href="/productos">
+                            <ShoppingBag className="h-4 w-4 mr-2" />
+                            Productos
+                          </Link>
+                        </Button>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Button variant="outline" className="justify-start" asChild>
+                          <Link href="/productos?nuevo=1">
+                            <Sparkles className="h-4 w-4 mr-2" />
+                            Nuevos
+                          </Link>
+                        </Button>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Button variant="outline" className="justify-start" asChild>
+                          <Link href="/productos/categoria/ofertas">
+                            <BadgePercent className="h-4 w-4 mr-2" />
+                            Ofertas
+                          </Link>
+                        </Button>
+                      </SheetClose>
+                    </nav>
+
+                    <div className="grid gap-2">
+                      <SheetClose asChild>
+                        <Button variant="outline" className="justify-start" asChild>
+                          <Link href={favoritesHref}>
+                            <Heart className="h-4 w-4 mr-2" />
+                            Favoritos
+                          </Link>
+                        </Button>
+                      </SheetClose>
+
+                      <Button
+                        variant="outline"
+                        className="justify-start"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          toggleCart();
+                        }}
+                      >
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        Carrito
+                        {isHydrated && itemCount > 0 && (
+                          <span className="ml-2 text-xs text-muted-foreground">
+                            ({itemCount})
+                          </span>
+                        )}
+                      </Button>
+
+                      {user ? (
+                        <Button
+                          variant="outline"
+                          className="justify-start"
+                          onClick={handleLogout}
+                          disabled={isLoggingOut}
+                        >
+                          <User className="h-4 w-4 mr-2" />
+                          {isLoggingOut ? "Cerrando..." : "Cerrar sesión"}
+                        </Button>
+                      ) : (
+                        <SheetClose asChild>
+                          <Button variant="outline" className="justify-start" asChild>
+                            <Link href="/login">
+                              <User className="h-4 w-4 mr-2" />
+                              Iniciar sesión
+                            </Link>
+                          </Button>
+                        </SheetClose>
+                      )}
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
         </div>

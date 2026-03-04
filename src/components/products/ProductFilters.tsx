@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   useCallback,
@@ -142,7 +142,8 @@ export const ProductFilters = ({
   }, [dragTarget, updateDragValue]);
 
   const startDrag =
-    (target: "min" | "max") => (event: ReactPointerEvent<HTMLButtonElement>) => {
+    (target: "min" | "max") =>
+    (event: ReactPointerEvent<HTMLButtonElement>) => {
       event.preventDefault();
       event.stopPropagation();
       setDragTarget(target);
@@ -194,7 +195,7 @@ export const ProductFilters = ({
 
       {colecciones.length > 0 && (
         <div>
-          <h3 className="font-semibold mb-3">Coleccion</h3>
+          <h3 className="font-semibold mb-3">Colección</h3>
           <div className="space-y-2 max-h-48 overflow-y-auto">
             {colecciones.map((coleccion) => (
               <div key={coleccion} className="flex items-center space-x-2">
@@ -238,7 +239,7 @@ export const ProductFilters = ({
             />
             <button
               type="button"
-              aria-label="Precio minimo"
+              aria-label="Precio mínimo"
               onPointerDown={startDrag("min")}
               className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 h-4 w-4 rounded-full border border-primary bg-white shadow-sm cursor-grab active:cursor-grabbing"
               style={{ left: `${minPercent}%` }}
@@ -246,7 +247,7 @@ export const ProductFilters = ({
 
             <button
               type="button"
-              aria-label="Precio maximo"
+              aria-label="Precio máximo"
               onPointerDown={startDrag("max")}
               className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 h-4 w-4 rounded-full border border-primary bg-white shadow-sm cursor-grab active:cursor-grabbing"
               style={{ left: `${maxPercent}%` }}
@@ -281,18 +282,18 @@ export const ProductFilters = ({
 
   return (
     <>
-      <div className="hidden lg:block w-64 space-y-6">
+      <div className="hidden md:block w-64 space-y-6">
         <FilterContent />
       </div>
 
       <Sheet>
-        <SheetTrigger asChild className="lg:hidden">
+        <SheetTrigger asChild className="md:hidden">
           <Button variant="outline" size="sm">
             <SlidersHorizontal className="mr-2 h-4 w-4" />
             Filtros
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-75 sm:w-100 overflow-y-auto">
+        <SheetContent side="left" className="w-[88%] max-w-sm overflow-y-auto px-4 pb-6">
           <SheetHeader>
             <SheetTitle>Filtros</SheetTitle>
           </SheetHeader>

@@ -96,8 +96,8 @@ export const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
             )}
           </div>
 
-          {/* Actions */}
-          <div className="absolute top-3 right-3 z-10 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          {/* Actions - Desktop (hover) */}
+          <div className="hidden md:flex absolute top-3 right-3 z-10 flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <Button
               size="icon"
               variant="secondary"
@@ -110,6 +110,28 @@ export const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
               size="icon"
               variant="secondary"
               className="rounded-full shadow-lg"
+              onClick={handleFavorite}
+            >
+              <Heart
+                className={`h-4 w-4 ${favorite ? "fill-current text-red-500" : ""}`}
+              />
+            </Button>
+          </div>
+
+          {/* Actions - Mobile (always visible, compact) */}
+          <div className="md:hidden absolute bottom-3 right-3 z-10 flex items-center gap-2 rounded-full bg-background/80 backdrop-blur px-2 py-1 shadow-sm">
+            <Button
+              size="icon-sm"
+              variant="secondary"
+              className="rounded-full"
+              onClick={handleQuickView}
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button
+              size="icon-sm"
+              variant="secondary"
+              className="rounded-full"
               onClick={handleFavorite}
             >
               <Heart

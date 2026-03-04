@@ -1,7 +1,8 @@
-// src/components/products/ProductsPageContent.tsx
-"use client";
+﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { X, Grid3x3, List } from "lucide-react";
 import { ProductGrid } from "./ProductGrid";
 import { ProductFilters } from "./ProductFilters";
 import { ProductSkeleton } from "./ProductSkeleton";
@@ -15,12 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { X, SlidersHorizontal, Grid3x3, List } from "lucide-react";
 import { ProductFilters as Filters, SortOption } from "@/types/product";
 import { useProducts } from "@/lib/hooks/useProducts";
-import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 
 interface ProductsPageContentProps {
   searchParams: {
@@ -36,8 +33,6 @@ export const ProductsPageContent = ({
   searchParams,
 }: ProductsPageContentProps) => {
   const router = useRouter();
-
-  // Estados
   const sp = useSearchParams();
 
   const [filters, setFilters] = useState<Filters>(() => ({
@@ -53,16 +48,11 @@ export const ProductsPageContent = ({
     (searchParams.ordenar as SortOption) || "newest",
   );
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [showFilters, setShowFilters] = useState(false);
 
-  // Datos con paginación infinita
   const { data, isLoading } = useProducts(filters, sortBy, 12);
-
-  // Acumular productos de todas las páginas para el contador
   const allProducts = data?.pages.flatMap((page) => page.products) ?? [];
   const totalProducts = allProducts.length;
 
-  // Actualizar URL cuando cambien los filtros
   const updateURL = (newFilters: Filters, newSort?: SortOption) => {
     const params = new URLSearchParams();
 
@@ -78,7 +68,6 @@ export const ProductsPageContent = ({
     router.push(url);
   };
 
-  // Manejar cambio de filtros (se llama desde ProductFilters al presionar "Aplicar")
   const handleFilterChange = (newFilters: Filters) => {
     const nextFilters =
       filters.nuevo && newFilters.nuevo === undefined
@@ -89,14 +78,12 @@ export const ProductsPageContent = ({
     updateURL(nextFilters, sortBy);
   };
 
-  // Manejar cambio de ordenamiento
   const handleSortChange = (value: string) => {
     const newSort = value as SortOption;
     setSortBy(newSort);
     updateURL(filters, newSort);
   };
 
-  // Limpiar filtro individual
   const removeFilter = (filterKey: keyof Filters) => {
     const newFilters = { ...filters };
     delete newFilters[filterKey];
@@ -104,16 +91,13 @@ export const ProductsPageContent = ({
     updateURL(newFilters, sortBy);
   };
 
-  // Limpiar todos los filtros
   const clearAllFilters = () => {
     setFilters({});
     setSortBy("newest");
     router.push("/productos");
   };
 
-  // Contar filtros activos
-  const activeFiltersCount = Object.values(filters).filter(Boolean).length;
-  const hasActiveFilters = activeFiltersCount > 0;
+  const hasActiveFilters = Object.values(filters).some(Boolean);
 
   const spTipo = sp.get("tipo");
   const spColeccion = sp.get("coleccion");
@@ -149,40 +133,19 @@ export const ProductsPageContent = ({
 
   return (
     <div className="space-y-6">
-      {/* ========================================
-          REMOVIDO: Bloque "Explora por categoría"
-          (ya existe el filtro por tipo)
-          ======================================== */}
-
-      {/* Barra de búsqueda y controles */}
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-        {/* Búsqueda */}
         <div className="w-full md:w-96">
           <SearchBar placeholder="Buscar productos..." autoFocus={false} />
         </div>
 
-        {/* Controles de vista y ordenamiento */}
         <div className="flex gap-2 items-center w-full md:w-auto justify-end">
-          {/* Toggle de filtros - Mobile */}
-          <Button
-            variant="outline"
-            size="sm"
-            className="md:hidden"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <SlidersHorizontal className="h-4 w-4 mr-2" />
-            Filtros
-            {activeFiltersCount > 0 && (
-              <Badge
-                variant="destructive"
-                className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
-              >
-                {activeFiltersCount}
-              </Badge>
-            )}
-          </Button>
+          <div className="md:hidden">
+            <ProductFilters
+              onFilterChange={handleFilterChange}
+              initialFilters={filters}
+            />
+          </div>
 
-          {/* Vista Grid/List */}
           <div className="hidden sm:flex border rounded-lg p-1 bg-muted/50">
             <Button
               variant={viewMode === "grid" ? "secondary" : "ghost"}
@@ -202,7 +165,6 @@ export const ProductsPageContent = ({
             </Button>
           </div>
 
-          {/* Ordenamiento */}
           <Select value={sortBy} onValueChange={handleSortChange}>
             <SelectTrigger className="w-45">
               <SelectValue placeholder="Ordenar por" />
@@ -218,15 +180,13 @@ export const ProductsPageContent = ({
         </div>
       </div>
 
-      {/* Filtros activos */}
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2 items-center bg-muted/50 p-4 rounded-lg">
           <span className="text-sm font-medium">Filtros activos:</span>
 
           {filters.tipo && (
             <Badge variant="secondary" className="gap-1 pl-3 pr-2">
-              Tipo:{" "}
-              <span className="font-semibold capitalize">{filters.tipo}</span>
+              Tipo: <span className="font-semibold capitalize">{filters.tipo}</span>
               <button
                 onClick={() => removeFilter("tipo")}
                 className="ml-1 hover:text-destructive transition-colors"
@@ -238,8 +198,7 @@ export const ProductsPageContent = ({
 
           {filters.coleccion && (
             <Badge variant="secondary" className="gap-1 pl-3 pr-2">
-              Colección:{" "}
-              <span className="font-semibold">{filters.coleccion}</span>
+              Colección: <span className="font-semibold">{filters.coleccion}</span>
               <button
                 onClick={() => removeFilter("coleccion")}
                 className="ml-1 hover:text-destructive transition-colors"
@@ -251,8 +210,7 @@ export const ProductsPageContent = ({
 
           {filters.search && (
             <Badge variant="secondary" className="gap-1 pl-3 pr-2">
-              Búsqueda:{" "}
-              <span className="font-semibold">"{filters.search}"</span>
+              Búsqueda: <span className="font-semibold">"{filters.search}"</span>
               <button
                 onClick={() => removeFilter("search")}
                 className="ml-1 hover:text-destructive transition-colors"
@@ -306,16 +264,13 @@ export const ProductsPageContent = ({
         </div>
       )}
 
-      {/* Contador de resultados */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
           {isLoading ? (
             "Cargando productos..."
           ) : (
             <>
-              <span className="font-semibold text-foreground">
-                {totalProducts}
-              </span>{" "}
+              <span className="font-semibold text-foreground">{totalProducts}</span>{" "}
               producto{totalProducts !== 1 ? "s" : ""}
               {data?.pages[data.pages.length - 1]?.hasMore && (
                 <span> (hay más disponibles)</span>
@@ -325,30 +280,9 @@ export const ProductsPageContent = ({
         </p>
       </div>
 
-      {/* Layout principal */}
       <div className="flex gap-8">
-        {/* Filtros laterales - Desktop */}
-        <aside
-          className={`
-          ${showFilters ? "block" : "hidden"} 
-          md:block 
-          w-full md:w-64 
-          shrink-0
-        `}
-        >
+        <aside className="hidden md:block w-64 shrink-0">
           <div className="sticky top-4">
-            <div className="mb-4 md:hidden">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full"
-                onClick={() => setShowFilters(false)}
-              >
-                <X className="h-4 w-4 mr-2" />
-                Cerrar filtros
-              </Button>
-            </div>
-
             <ProductFilters
               onFilterChange={handleFilterChange}
               initialFilters={filters}
@@ -356,7 +290,6 @@ export const ProductsPageContent = ({
           </div>
         </aside>
 
-        {/* Grid/Lista de productos */}
         <main className="flex-1 min-w-0">
           {isLoading ? (
             <ProductSkeleton count={12} />

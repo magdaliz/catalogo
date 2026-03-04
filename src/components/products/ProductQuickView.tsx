@@ -3,7 +3,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { ShoppingCart, Heart, ExternalLink } from "lucide-react";
 import {
   Dialog,
@@ -72,9 +71,14 @@ export const ProductQuickView = ({
     }
   };
 
+  const handleViewDetails = () => {
+    onClose();
+    router.push(`/productos/${product.id}`);
+  };
+
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[95vw] sm:max-w-3xl lg:max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="sr-only">
             Vista rápida de {product.nombre}
@@ -162,15 +166,22 @@ export const ProductQuickView = ({
               </Button>
 
               <div className="grid grid-cols-2 gap-3">
-                <Button variant="outline" size="lg" asChild>
-                  <Link href={`/productos/${product.id}`}>
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    Ver detalles
-                  </Link>
+                <Button
+                  variant="outline"
+                  className="w-full px-4 md:px-5"
+                  onClick={handleViewDetails}
+                >
+                  <ExternalLink className="h-4 w-4 shrink-0" />
+                  <span className="md:hidden">Ver detalles</span>
+                  <span className="hidden md:inline">Detalles</span>
                 </Button>
-                <Button variant="outline" size="lg" onClick={handleFavorite}>
+                <Button
+                  variant="outline"
+                  className="w-full px-4 md:px-5"
+                  onClick={handleFavorite}
+                >
                   <Heart
-                    className={`mr-2 h-4 w-4 ${favorite ? "fill-current text-red-500" : ""}`}
+                    className={`h-4 w-4 shrink-0 ${favorite ? "fill-current text-red-500" : ""}`}
                   />
                   Favoritos
                 </Button>
