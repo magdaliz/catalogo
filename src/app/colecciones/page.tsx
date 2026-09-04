@@ -21,6 +21,7 @@ const coleccionImages: Record<string, string> = {
   Personalizados: "/images/colecciones/personalizados.png",
   "Pulseras Superhéroes": "/images/colecciones/superheroes.png",
   Resina: "/images/colecciones/resina.png",
+  Recamado: "/images/colecciones/recamado.png",
 };
 
 // Colores de fondo para cada colección
