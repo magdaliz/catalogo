@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { useColecciones } from "@/lib/hooks/useProducts";
+import { useColeccionesConImagen } from "@/lib/hooks/useProducts";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CollectionCard } from "./CollectionCard";
@@ -36,7 +36,7 @@ const coleccionColors: Record<string, string> = {
 };
 
 export default function ColeccionesPage() {
-  const { data: colecciones = [], isLoading } = useColecciones();
+  const { data: colecciones = [], isLoading } = useColeccionesConImagen();
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,14 +80,16 @@ export default function ColeccionesPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {colecciones.map((coleccion, index) => {
               const imageSrc =
-                coleccionImages[coleccion] || "/images/placeholder.jpg";
+                coleccion.imagen ||
+                coleccionImages[coleccion.nombre] ||
+                "/images/placeholder.jpg";
               const bgGradient =
-                coleccionColors[coleccion] || "from-gray-100 to-gray-200";
+                coleccionColors[coleccion.nombre] || "from-gray-100 to-gray-200";
 
               return (
                 <CollectionCard
-                  key={coleccion}
-                  nombre={coleccion}
+                  key={coleccion.nombre}
+                  nombre={coleccion.nombre}
                   imagen={imageSrc}
                   bgColor={`bg-linear-to-br ${bgGradient}`}
                   index={index}

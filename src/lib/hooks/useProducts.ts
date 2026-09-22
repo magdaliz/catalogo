@@ -434,4 +434,49 @@ export const useColecciones = () => {
   });
 };
 
+export interface ColeccionConImagen {
+  nombre: string;
+  imagen?: string;
+}
+
+// Colecciones antiguas pueden no tener imagen hasta completar migracion.
+export const useColeccionesConImagen = () => {
+  return useQuery({
+    queryKey: ["colecciones-con-imagen"],
+    queryFn: async (): Promise<ColeccionConImagen[]> => {
+      try {
+        const snapshot = await getDocs(collection(db, "colecciones"));
+        const collections = snapshot.docs
+          .map((docSnap) => docSnap.data())
+          .filter((data) => data?.activa !== false && typeof data?.nombre === "string")
+          .map((data) => ({
+            nombre: String(data.nombre).trim(),
+            imagen: typeof data.imagen === "string" ? data.imagen : undefined,
+          }))
+          .filter((data) => data.nombre);
+
+        if (collections.length > 0) {
+          return Array.from(
+            new Map(collections.map((item) => [item.nombre, item])).values(),
+          ).sort((a, b) => a.nombre.localeCompare(b.nombre));
+        }
+      } catch {
+        // Fallback for public readers without collection access.
+      }
+
+      const snapshot = await getDocs(collection(db, "productos"));
+      return Array.from(
+        new Set(
+          snapshot.docs
+            .map((docSnap) => String(docSnap.data().coleccion ?? "").trim())
+            .filter(Boolean),
+        ),
+      )
+        .sort()
+        .map((nombre) => ({ nombre }));
+    },
+    staleTime: 1000 * 60 * 10,
+  });
+};
+
 
