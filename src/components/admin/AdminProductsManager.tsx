@@ -15,6 +15,7 @@ import {
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { db, storage } from "@/lib/firebase/config";
 import { Product } from "@/types/product";
+import { addThreeMonths } from "@/lib/utils/productNew";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -35,6 +36,7 @@ interface ProductFormState {
   imagen: string;
   descuento: string;
   nuevo: boolean;
+  nuevoHasta?: Date;
 }
 
 const emptyForm: ProductFormState = {
@@ -72,6 +74,7 @@ export function AdminProductsManager() {
             imagen: data.imagen,
             imagenAlt: data.imagenAlt,
             nuevo: !!data.nuevo,
+            nuevoHasta: data.nuevoHasta?.toDate?.() ?? data.nuevoHasta,
             createdAt: data.createdAt?.toDate?.() ?? data.createdAt,
           } as Product;
         });
@@ -146,6 +149,7 @@ export function AdminProductsManager() {
       imagen: form.imagen.trim() || "/images/placeholder.jpg",
       imagenAlt: form.nombre.trim(),
       nuevo: !!form.nuevo,
+      nuevoHasta: form.nuevo ? form.nuevoHasta ?? addThreeMonths() : null,
       updatedAt: serverTimestamp(),
     };
 
@@ -182,6 +186,7 @@ export function AdminProductsManager() {
       imagen: product.imagen ?? "",
       descuento: String(product.descuento ?? 0),
       nuevo: !!product.nuevo,
+      nuevoHasta: product.nuevoHasta,
     });
   };
 
@@ -290,7 +295,13 @@ export function AdminProductsManager() {
             <input
               type="checkbox"
               checked={form.nuevo}
-              onChange={(e) => setForm((s) => ({ ...s, nuevo: e.target.checked }))}
+              onChange={(e) =>
+                setForm((s) => ({
+                  ...s,
+                  nuevo: e.target.checked,
+                  nuevoHasta: e.target.checked ? addThreeMonths() : undefined,
+                }))
+              }
             />
             Marcar como nuevo
           </label>

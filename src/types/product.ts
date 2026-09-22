@@ -9,6 +9,7 @@ export interface Product {
   tipo: string; // ej: "aretes", "collares", "pulseras"
   coleccion: string; // ej: "Personalizados", "Premium", etc.
   nuevo?: boolean;
+  nuevoHasta?: Date;
   createdAt?: Date;
   imagen: string;
   imagenAlt?: string;
@@ -21,6 +22,7 @@ export interface ProductExtended extends Product {
   descuento?: number;
   destacado?: boolean;
   nuevo?: boolean;
+  nuevoHasta?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }

@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/types/product";
+import { isProductNew } from "@/lib/utils/productNew";
 import { useCartStore } from "@/store/cartStore";
 import {
   formatPrice,
@@ -104,7 +105,7 @@ export const ProductQuickView = ({
                     {product.coleccion}
                   </Badge>
                 )}
-                {product.nuevo && <Badge variant="destructive">Nuevo</Badge>}
+                {isProductNew(product) && <Badge variant="destructive">Nuevo</Badge>}
                 {hasProductDiscount && (
                   <Badge className="bg-red-600 hover:bg-red-700">
                     -{discount}%
