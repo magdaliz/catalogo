@@ -2,6 +2,7 @@
 
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -24,6 +25,29 @@ import { toast } from "sonner";
 interface ProductCardProps {
   product: Product;
   onQuickView?: (product: Product) => void;
+}
+
+function ProductImage({ src, alt }: { src: string; alt: string }) {
+  const [loading, setLoading] = useState(true);
+
+  return (
+    <>
+      {loading && (
+        <div className="absolute inset-0 animate-pulse bg-white/45">
+          <div className="absolute inset-x-8 top-1/2 h-3 -translate-y-1/2 rounded-full bg-white/70" />
+        </div>
+      )}
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        onLoad={() => setLoading(false)}
+        onError={() => setLoading(false)}
+        className={`object-cover transition-[opacity,transform] duration-300 group-hover:scale-110 ${loading ? "opacity-0" : "opacity-100"}`}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      />
+    </>
+  );
 }
 
 export const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
@@ -63,10 +87,10 @@ export const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
       toast.success(
         favorite ? "Quitado de favoritos" : "Agregado a favoritos",
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("toggleFavorite error:", error);
       toast.error("No se pudo actualizar favoritos", {
-        description: error?.code || error?.message || "Error desconocido",
+        description: error instanceof Error ? error.message : "Error desconocido",
       });
     }
   };
@@ -141,12 +165,10 @@ export const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
           </div>
 
           {/* Image */}
-          <Image
+          <ProductImage
+            key={product.imagen || "/images/placeholder.jpg"}
             src={product.imagen || "/images/placeholder.jpg"}
             alt={product.imagenAlt || product.nombre}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-110"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
 
           {/* Hover overlay */}

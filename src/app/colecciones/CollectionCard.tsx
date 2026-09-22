@@ -1,6 +1,7 @@
 // src/components/colecciones/CollectionCard.tsx
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -11,6 +12,29 @@ interface CollectionCardProps {
   imagen: string;
   bgColor: string;
   index: number;
+}
+
+function CollectionImage({ imagen, nombre }: Pick<CollectionCardProps, "imagen" | "nombre">) {
+  const [loading, setLoading] = useState(true);
+
+  return (
+    <div className="relative w-full h-full overflow-hidden">
+      {loading && (
+        <div className="absolute inset-0 animate-pulse bg-white/45">
+          <div className="absolute inset-x-8 top-1/2 h-3 -translate-y-1/2 rounded-full bg-white/70" />
+        </div>
+      )}
+      <Image
+        src={imagen}
+        alt={nombre}
+        fill
+        onLoad={() => setLoading(false)}
+        onError={() => setLoading(false)}
+        className={`object-contain transition-[opacity,transform] duration-500 group-hover:scale-105 ${loading ? "opacity-0" : "opacity-100"}`}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+      />
+    </div>
+  );
 }
 
 export const CollectionCard = ({
@@ -36,15 +60,7 @@ export const CollectionCard = ({
             className={`relative w-full aspect-square ${bgColor} overflow-hidden`}
           >
             {/* Imagen */}
-            <div className="relative w-full h-full overflow-hidden">
-              <Image
-                src={imagen}
-                alt={nombre}
-                fill
-                className="object-contain group-hover:scale-105 transition-transform duration-500"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-              />
-            </div>
+            <CollectionImage key={imagen} imagen={imagen} nombre={nombre} />
 
             {/* Label */}
             <div className="absolute top-4 right-4">
