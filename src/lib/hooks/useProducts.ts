@@ -16,6 +16,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { Product, ProductFilters, SortOption } from "@/types/product";
+import { isProductNew } from "@/lib/utils/productNew";
 
 // ==========================================
 // Hook principal con PAGINACIÃ“N INFINITA
@@ -117,6 +118,7 @@ export const useProducts = (
             tipo: d.tipo,
             coleccion: d.coleccion,
             nuevo: d.nuevo,
+            nuevoHasta: d.nuevoHasta?.toDate?.() ?? d.nuevoHasta,
             createdAt: d.createdAt?.toDate?.() ?? d.createdAt,
             imagen: d.imagen,
             imagenAlt: d.imagenAlt,
@@ -126,9 +128,12 @@ export const useProducts = (
         const searchTerm = filters?.search?.trim().toLowerCase() ?? "";
         const normalizedSearch = searchTerm.replace(/\s+/g, " ");
 
+        const activeNewProducts = filters?.nuevo
+          ? products.filter((product) => isProductNew(product))
+          : products;
         const filteredProducts =
           normalizedSearch.length > 0
-            ? products.filter((product) => {
+            ? activeNewProducts.filter((product) => {
                 const haystack = [
                   product.nombre ?? "",
                   product.tipo ?? "",
@@ -139,7 +144,7 @@ export const useProducts = (
                   .replace(/\s+/g, " ");
                 return haystack.includes(normalizedSearch);
               })
-            : products;
+            : activeNewProducts;
 
         return {
           products: filteredProducts,
@@ -187,6 +192,8 @@ export const useProduct = (productId: string) => {
         descuento: data.descuento,
         tipo: data.tipo,
         coleccion: data.coleccion,
+        nuevo: data.nuevo,
+        nuevoHasta: data.nuevoHasta?.toDate?.() ?? data.nuevoHasta,
         imagen: data.imagen,
         imagenAlt: data.imagenAlt,
       } as Product;

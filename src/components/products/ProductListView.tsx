@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart, Heart, Eye } from "lucide-react";
 import { Product } from "@/types/product";
+import { isProductNew } from "@/lib/utils/productNew";
 import { useCartStore } from "@/store/cartStore";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -103,7 +104,7 @@ export const ProductListView = ({
                       {product.coleccion}
                     </Badge>
                   )}
-                  {product.nuevo && (
+                  {isProductNew(product) && (
                     <Badge variant="destructive" className="text-xs">
                       Nuevo
                     </Badge>

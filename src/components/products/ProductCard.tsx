@@ -21,6 +21,7 @@ import { useFavorites } from "@/lib/favorites/FavoritesContext";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { isProductNew } from "@/lib/utils/productNew";
 
 interface ProductCardProps {
   product: Product;
@@ -112,7 +113,7 @@ export const ProductCard = ({ product, onQuickView }: ProductCardProps) => {
                 {product.coleccion}
               </Badge>
             )}
-            {product.nuevo && <Badge variant="destructive">Nuevo</Badge>}
+            {isProductNew(product) && <Badge variant="destructive">Nuevo</Badge>}
             {hasProductDiscount && (
               <Badge className="bg-red-600 hover:bg-red-700">
                 -{discount}%
