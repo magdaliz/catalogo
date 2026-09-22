@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { addDoc, collection, deleteDoc, doc, onSnapshot, orderBy, query, serverTimestamp, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, orderBy, query, serverTimestamp, updateDoc, where, writeBatch } from "firebase/firestore";
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { db, storage } from "@/lib/firebase/config";
 import { slugify } from "@/lib/utils/formatters";
@@ -26,6 +26,7 @@ interface CollectionFormState {
   activa: boolean;
   imagen?: string;
   imagenStoragePath?: string;
+  nombreOriginal?: string;
 }
 
 const emptyForm: CollectionFormState = { nombre: "", descripcion: "", activa: true };
@@ -78,6 +79,22 @@ export function AdminCollectionsManager() {
     return { imagen: await getDownloadURL(storageRef), imagenStoragePath: path };
   };
 
+  const syncProductCollectionName = async (oldName: string, newName: string) => {
+    const productsSnapshot = await getDocs(
+      query(collection(db, "productos"), where("coleccion", "==", oldName)),
+    );
+
+    for (let index = 0; index < productsSnapshot.docs.length; index += 450) {
+      const batch = writeBatch(db);
+      productsSnapshot.docs.slice(index, index + 450).forEach((productDoc) => {
+        batch.update(productDoc.ref, { coleccion: newName, updatedAt: serverTimestamp() });
+      });
+      await batch.commit();
+    }
+
+    return productsSnapshot.size;
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!form.nombre.trim()) return toast.error("El nombre es obligatorio");
@@ -102,7 +119,17 @@ export function AdminCollectionsManager() {
             toast.warning("Coleccion actualizada, pero imagen anterior no se pudo borrar");
           }
         }
-        toast.success("Coleccion actualizada");
+        if (form.nombreOriginal && form.nombreOriginal !== payload.nombre) {
+          try {
+            const productCount = await syncProductCollectionName(form.nombreOriginal, payload.nombre);
+            toast.success(`Coleccion actualizada. ${productCount} productos actualizados.`);
+          } catch (error) {
+            console.error(error);
+            toast.warning("Coleccion actualizada, pero no se pudieron actualizar sus productos");
+          }
+        } else {
+          toast.success("Coleccion actualizada");
+        }
       } else {
         const collectionRef = await addDoc(collection(db, "colecciones"), { ...payload, createdAt: serverTimestamp() });
         createdCollectionId = collectionRef.id;
@@ -128,7 +155,7 @@ export function AdminCollectionsManager() {
   };
 
   const onEdit = (item: CollectionDoc) => {
-    setForm({ id: item.id, nombre: item.nombre ?? "", descripcion: item.descripcion ?? "", activa: item.activa !== false, imagen: item.imagen, imagenStoragePath: item.imagenStoragePath });
+    setForm({ id: item.id, nombre: item.nombre ?? "", nombreOriginal: item.nombre ?? "", descripcion: item.descripcion ?? "", activa: item.activa !== false, imagen: item.imagen, imagenStoragePath: item.imagenStoragePath });
     setImageFile(null);
     setImagePreview(item.imagen ?? "");
   };
